@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Як розвиток технологій змінив електронну музику? — Косьянова Аліка, 11-А, ОПЛ «Гармонія»</title>
+<meta name="description" content="Інтерактивний семестровий проєкт: від Телармоніума й терменвокса до MIDI, комп’ютера та штучного інтелекту. Косьянова Аліка, 11-А клас ОПЛ «Гармонія». Керівник: Мушинський А.В.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23000'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%2386E8B0' stroke-width='10'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%2386E8B0'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Tektur:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#000;
+  --white:#fff;
+  --mint:#86E8B0;
+  --mint-deep:#2fb97d;
+  --red:#ff3b30;
+  --line:rgb(255 255 255 / .16);
+  --soft:rgb(255 255 255 / .06);
+  --muted:rgb(255 255 255 / .68);
+  --display:'Tektur','Russo One','Arial Narrow',Impact,sans-serif;
+  --body:'Onest','Segoe UI',Roboto,Arial,sans-serif;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+body{margin:0;background:var(--black);color:var(--white);font:400 17px/1.62 var(--body);overflow-x:hidden;padding-top:var(--safe-t)}
+img{max-width:100%;display:block}
+a{color:var(--mint)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.mint :focus-visible{outline-color:#000}
+.wrap{width:min(1180px,100% - 48px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- top bar ---------- */
+#progress{position:fixed;top:var(--safe-t);left:0;height:3px;width:0;background:var(--mint);z-index:60}
+.top{position:fixed;top:var(--safe-t);left:0;right:0;height:56px;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 max(16px,calc((100vw - 1180px)/2));background:rgb(0 0 0 / .82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;min-width:0}
+.top .brand img{height:26px;width:auto;filter:brightness(0) invert(1)}
+.top .brand span{font:700 .8rem/1.1 var(--display);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .tools{display:flex;gap:8px;flex-shrink:0}
+.pill{border:1.5px solid var(--mint);background:transparent;color:var(--mint);border-radius:999px;padding:6px 14px;font:600 .85rem/1 var(--body);display:inline-flex;align-items:center;gap:8px;transition:background .2s,color .2s}
+.pill:hover,.pill[aria-pressed="true"]{background:var(--mint);color:#000}
+.pill .bars{display:inline-flex;gap:2px;align-items:flex-end;height:12px}
+.pill .bars i{width:3px;background:currentColor;display:block;height:30%;animation:eq 1s infinite ease-in-out}
+.pill .bars i:nth-child(2){animation-delay:.2s}.pill .bars i:nth-child(3){animation-delay:.4s}
+body:not(.playing) .pill .bars i{animation:none;height:20%}
+body.playing #soundBtn{background:var(--red);border-color:var(--red);color:#fff}
+@keyframes eq{0%,100%{height:25%}50%{height:100%}}
+
+/* ---------- TOC overlay ---------- */
+#toc{position:fixed;inset:0;z-index:70;background:#000;display:none;overflow:auto;padding:90px 0 60px}
+#toc.open{display:block}
+#toc ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;counter-reset:c}
+#toc li a{display:flex;gap:14px;align-items:baseline;padding:16px 18px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:#fff;font:700 1.05rem/1.25 var(--display);text-transform:uppercase;transition:background .2s,color .2s,transform .2s}
+#toc li a b{color:var(--mint);min-width:2ch;font-weight:700}
+#toc li a:hover{background:var(--mint);color:#000;transform:translateY(-2px)}
+#toc li a:hover b{color:#000}
+#toc .close{position:fixed;top:calc(14px + var(--safe-t));right:max(16px,calc((100vw - 1180px)/2))}
+#toc h2{font:900 clamp(1.6rem,4vw,2.6rem)/1 var(--display);text-transform:uppercase;margin:0 0 28px;color:var(--mint)}
+
+/* ---------- type ---------- */
+.d{font-family:var(--display);text-transform:uppercase;letter-spacing:.005em;line-height:1.02;font-weight:800}
+h1,h2,h3{margin:0}
+h2.d{font-size:clamp(1.9rem,4.6vw,3.6rem)}
+h3{font:700 1.25rem/1.25 var(--body)}
+p{margin:0 0 1em;max-width:68ch}
+.lead{font-size:1.2rem;line-height:1.55;max-width:60ch}
+.muted-t{color:var(--muted)}
+.mint .muted-t{color:rgb(0 0 0 / .66)}
+.warp span{display:inline-block;will-change:transform;white-space:pre}
+.red{color:var(--red)}
+.mintc{color:var(--mint)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;background:var(--mint);color:#000;font:700 1rem/1 var(--body);padding:15px 26px;text-decoration:none;transition:transform .15s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:#fff;border:1.5px solid rgb(255 255 255 / .6)}
+.btn.ghost:hover{border-color:var(--mint);color:var(--mint)}
+.btn.dark{background:#000;color:var(--mint)}
+.btn.sm{padding:10px 18px;font-size:.9rem}
+.mint .btn.ghost{color:#000;border-color:#000}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:96px 0 70px}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+#heroCanvas:active{cursor:grabbing}
+.hero .in{position:relative;z-index:2;pointer-events:none}
+.hero .in>*{pointer-events:auto}
+.hero h1{font-size:clamp(2.3rem,6.4vw,5.6rem);max-width:15ch;text-shadow:0 0 30px rgb(0 0 0 / .8)}
+.hero .sub{font-size:clamp(1.05rem,2vw,1.4rem);max-width:30ch;margin:22px 0 28px;color:#fff;text-shadow:0 0 20px #000}
+.hero .by{display:grid;gap:2px;margin-bottom:28px;font-size:.98rem;color:var(--muted);text-shadow:0 0 14px #000}
+.hero .by b{color:#fff;font-weight:600}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px}
+.hint{position:absolute;z-index:2;bottom:22px;left:0;right:0;text-align:center;font-size:.85rem;color:var(--muted);pointer-events:none}
+.hero-tri{position:absolute;left:0;top:0;width:min(34vw,420px);aspect-ratio:1;background:var(--mint);clip-path:polygon(0 0,100% 0,0 100%);opacity:.0;pointer-events:none}
+
+/* ---------- zebra ---------- */
+.zebra{height:58px;background:repeating-linear-gradient(90deg,#000 0 26px,#fff 26px 52px)}
+.zebra.tall{height:96px}
+
+/* ---------- chapters ---------- */
+.chap{position:relative;padding:110px 0 100px}
+.chap.mint{background:var(--mint);color:#000}
+.chap.mint a{color:#000}
+.chap-head{display:grid;grid-template-columns:auto 1fr;gap:6px 28px;align-items:end;margin-bottom:40px}
+.chap-head .n{font:900 clamp(4rem,12vw,9rem)/.8 var(--display);color:transparent;-webkit-text-stroke:2px var(--mint)}
+.mint .chap-head .n{-webkit-text-stroke-color:#000}
+.chap-head h2{padding-bottom:6px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.cols.wide-l{grid-template-columns:1.15fr .85fr}
+.cols.wide-r{grid-template-columns:.85fr 1.15fr}
+.stack>*+*{margin-top:18px}
+.panel{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:22px}
+.mint .panel{background:rgb(0 0 0 / .07);border-color:rgb(0 0 0 / .25)}
+.panel.dark{background:#000;color:#fff;border-color:#000}
+.panel h3{margin-bottom:8px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:26px}
+.fact{border-left:3px solid var(--mint);padding:4px 0 4px 14px}
+.mint .fact{border-left-color:#000}
+.fact b{display:block;font:800 1.9rem/1.1 var(--display)}
+.fact span{font-size:.92rem;color:var(--muted);display:block;margin-top:4px}
+.mint .fact span{color:rgb(0 0 0 / .7)}
+.src{font-size:.8rem;color:var(--muted);margin-top:14px}
+.mint .src{color:rgb(0 0 0 / .65)}
+.demo{border:1.5px solid var(--mint);border-radius:18px;padding:22px;background:rgb(134 232 176 / .06)}
+.mint .demo{border-color:#000;background:rgb(0 0 0 / .06)}
+.demo .label{font:700 .85rem/1 var(--body);color:var(--mint);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.mint .demo .label{color:#000}
+.demo .label::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+canvas.scope{width:100%;display:block;border-radius:10px;background:#000;border:1px solid var(--line)}
+.mint canvas.scope{border-color:#000}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ctl{display:grid;gap:6px;margin:14px 0}
+.ctl label,.ctl .lab{font-size:.88rem;font-weight:600;display:flex;justify-content:space-between;gap:12px}
+.ctl output{font-variant-numeric:tabular-nums;color:var(--mint)}
+.mint .ctl output{color:#000}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:5px;background:rgb(255 255 255 / .28)}
+input[type=range]::-moz-range-track{height:5px;border-radius:5px;background:rgb(255 255 255 / .28)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--mint);border:3px solid #000;margin-top:-9px;box-shadow:0 0 0 1.5px var(--mint)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--mint);border:3px solid #000;box-shadow:0 0 0 1.5px var(--mint)}
+.mint input[type=range]::-webkit-slider-runnable-track{background:rgb(0 0 0 / .3)}
+.mint input[type=range]::-moz-range-track{background:rgb(0 0 0 / .3)}
+.mint input[type=range]::-webkit-slider-thumb{background:#000;border-color:var(--mint);box-shadow:0 0 0 1.5px #000}
+.mint input[type=range]::-moz-range-thumb{background:#000;border-color:var(--mint);box-shadow:0 0 0 1.5px #000}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:8px 15px;font-size:.9rem;font-weight:600;transition:all .15s}
+.seg button:hover{border-color:var(--mint)}
+.seg button[aria-pressed="true"]{background:var(--mint);color:#000;border-color:var(--mint)}
+.mint .seg button{border-color:rgb(0 0 0 / .35)}
+.mint .seg button:hover{border-color:#000}
+.mint .seg button[aria-pressed="true"]{background:#000;color:var(--mint);border-color:#000}
+.readout{font:700 1.5rem/1.1 var(--display);margin:6px 0 2px}
+.hear{position:relative;height:30px;margin-top:8px;border-radius:8px;background:linear-gradient(90deg,rgb(134 232 176 / .15),rgb(134 232 176 / .45))}
+.hear i{position:absolute;top:-4px;bottom:-4px;width:3px;background:#fff;border-radius:2px;transition:left .1s}
+.hear small{position:absolute;bottom:3px;font-size:.7rem;color:#fff;opacity:.85}
+
+/* ---------- 3D canvas ---------- */
+#labCanvas{width:100%;height:min(46vh,380px);display:block;border-radius:14px;background:#000;border:1px solid var(--line);cursor:grab;touch-action:pan-y}
+
+/* ---------- signal chain ---------- */
+.chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:10px 0 18px}
+.chain button{flex:1 1 130px;min-width:130px;border:1.5px solid #000;background:transparent;color:#000;padding:16px 14px;border-radius:12px;text-align:left;margin:4px;transition:all .2s;position:relative}
+.chain button b{display:block;font:800 1rem/1.1 var(--display);text-transform:uppercase}
+.chain button span{font-size:.82rem;opacity:.75}
+.chain button[aria-pressed="true"]{background:#000;color:var(--mint);transform:translateY(-4px) rotateX(8deg)}
+.chain-info{min-height:5.2em}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.vs div{border-radius:12px;padding:16px;border:1.5px solid #000}
+.vs div:last-child{background:#000;color:#fff}
+.vs h3{font-size:1rem;margin-bottom:6px}
+.vs ul{margin:0;padding-left:1.1em;font-size:.95rem}
+
+/* ---------- era explorer ---------- */
+.era{display:grid;grid-template-columns:1.25fr .75fr;gap:26px;align-items:stretch}
+#eraCanvas{width:100%;height:300px;display:block;border-radius:14px;background:#000;border:1px solid var(--line)}
+.era-card{display:flex;flex-direction:column;gap:10px}
+.era-card .yr{font:800 2rem/1 var(--display);color:var(--mint)}
+.era-card .nm{font:800 1.35rem/1.15 var(--display);text-transform:uppercase}
+.era-card dl{margin:0;display:grid;gap:10px}
+.era-card dt{font-size:.78rem;color:var(--muted);font-weight:600}
+.era-card dd{margin:0}
+.meter{height:10px;border-radius:10px;background:rgb(255 255 255 / .14);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mint),var(--red));border-radius:10px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.eraTrack{margin-top:18px}
+.eraDots{display:flex;justify-content:space-between;gap:4px;margin-top:6px}
+.eraDots button{flex:1;border:0;background:transparent;color:var(--muted);font-size:.72rem;padding:6px 0;border-top:3px solid var(--line);transition:all .2s}
+.eraDots button[aria-current="true"]{color:var(--mint);border-top-color:var(--mint)}
+.eraDots button:hover{color:#fff}
+
+/* ---------- balance ---------- */
+#balance{width:100%;height:auto;display:block}
+.balance-wrap{display:grid;grid-template-columns:1fr;gap:6px}
+
+/* ---------- theremin ---------- */
+#thereminPad{width:100%;height:300px;display:block;border-radius:14px;background:#000;border:1px solid var(--line);touch-action:none;cursor:crosshair}
+
+/* ---------- ribbon ---------- */
+.ribbon{position:relative;height:96px;border-radius:14px;background:linear-gradient(180deg,#151515,#050505);border:1px solid var(--line);touch-action:none;cursor:ew-resize;overflow:hidden}
+.ribbon::before{content:"";position:absolute;left:14px;right:14px;top:50%;height:6px;margin-top:-3px;border-radius:6px;background:repeating-linear-gradient(90deg,var(--mint) 0 2px,transparent 2px 16px);opacity:.5}
+.ribbon .dot{position:absolute;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:var(--mint);box-shadow:0 0 30px var(--mint);opacity:0;transform:scale(.4);transition:opacity .15s,transform .15s;pointer-events:none}
+.ribbon.on .dot{opacity:1;transform:scale(1)}
+.ribbon .lbl{position:absolute;bottom:8px;font-size:.72rem;color:var(--muted)}
+
+/* ---------- keyboard ---------- */
+.kbwrap{overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.kb{position:relative;display:flex;height:150px;min-width:560px;user-select:none;-webkit-user-select:none;touch-action:none}
+.kb.tall{height:170px;min-width:820px}
+.kb .w{flex:1;border:1px solid #000;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#f4f4f4,#fff 60%);color:#000;position:relative;display:flex;align-items:flex-end;justify-content:center;font-size:.68rem;padding-bottom:6px;transition:background .08s}
+.kb .b{position:absolute;top:0;height:60%;background:#111;border:1px solid #000;border-radius:0 0 6px 6px;z-index:2;transition:background .08s;box-shadow:0 4px 0 #000}
+.kb .w.down{background:var(--mint)}
+.kb .b.down{background:var(--mint-deep)}
+.kb .w .tag{pointer-events:none;opacity:.55}
+.tape{margin-top:16px;display:grid;gap:8px}
+.tape .reel{height:34px;border-radius:8px;border:1.5px solid var(--line);background:repeating-linear-gradient(90deg,#1a1a1a 0 14px,#2a2a2a 14px 28px);position:relative;overflow:hidden}
+.tape .reel.run{animation:tape .5s linear infinite}
+@keyframes tape{to{background-position:-28px 0}}
+.tape .prog{height:6px;background:rgb(255 255 255 / .15);border-radius:6px;overflow:hidden}
+.tape .prog i{display:block;height:100%;width:0;background:var(--mint)}
+.mint .tape .reel{border-color:#000}
+.mint .tape .prog{background:rgb(0 0 0 / .2)}
+.mint .tape .prog i{background:#000}
+
+/* ---------- moog ---------- */
+#filtCanvas{width:100%;height:150px;display:block;border-radius:10px;background:#000;border:1px solid var(--line)}
+.knobs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+
+/* ---------- sequencer ---------- */
+.seq{display:grid;gap:8px}
+.seq-row{display:grid;grid-template-columns:62px 1fr;gap:10px;align-items:center}
+.seq-row>span{font-size:.8rem;font-weight:700}
+.steps{display:grid;grid-template-columns:repeat(16,1fr);gap:4px}
+.steps button{aspect-ratio:1/1.15;min-width:0;border-radius:6px;border:1.5px solid rgb(255 255 255 / .22);background:rgb(255 255 255 / .05);padding:0;transition:background .08s,transform .08s}
+.steps button:nth-child(4n+1){border-color:rgb(255 255 255 / .45)}
+.steps button.on{background:var(--mint);border-color:var(--mint)}
+.steps button.cur{transform:translateY(-4px);box-shadow:0 6px 0 -2px rgb(255 255 255 / .6)}
+.steps button.on.cur{background:#fff;border-color:#fff}
+#miniPlayer{position:fixed;left:50%;bottom:calc(16px + var(--safe-b));transform:translate(-50%,140%);z-index:55;background:var(--mint);color:#000;border-radius:999px;padding:10px 12px 10px 20px;display:flex;gap:14px;align-items:center;font-weight:700;box-shadow:0 10px 40px rgb(0 0 0 / .6);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);max-width:calc(100vw - 24px)}
+#miniPlayer.show{transform:translate(-50%,0)}
+#miniPlayer button{border:0;background:#000;color:var(--mint);border-radius:999px;padding:8px 14px;font-weight:700}
+
+/* ---------- midi ---------- */
+.midilog{background:#000;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:500 .84rem/1.55 ui-monospace,Menlo,Consolas,monospace;min-height:11.5em;color:var(--mint);overflow:hidden}
+.midilog div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.midilog div:first-child{color:#fff}
+.midilog .hex{color:var(--red);margin-right:10px}
+
+/* ---------- bars chart ---------- */
+.bars-chart{display:grid;gap:12px}
+.bar-row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;font-size:.92rem}
+.bar-row .track{height:30px;border-radius:8px;background:rgb(255 255 255 / .08);position:relative;overflow:hidden}
+.mint .bar-row .track{background:rgb(0 0 0 / .1)}
+.bar-row .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:var(--mint);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.bar-row .fill.red{background:var(--red)}
+.bar-row .rng{position:absolute;top:5px;bottom:5px;left:var(--l,0);border-radius:6px;background:var(--mint);transition:width 1s;width:0}
+.mint .bar-row .rng{background:#000}
+.bar-row .val{position:absolute;top:0;bottom:0;display:flex;align-items:center;font-weight:700;font-size:.85rem;white-space:nowrap;opacity:0;transition:opacity .4s .9s}
+.inview .bar-row .val{opacity:1}
+.axis{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin:6px 0 0 162px}
+.mint .axis{color:rgb(0 0 0 / .7)}
+.inview .bar-row .fill{width:var(--w)}
+.inview .bar-row .rng{width:var(--w)}
+
+/* ---------- genre flip cards ---------- */
+.genres{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:28px}
+.flip{perspective:1100px;height:270px}
+.flip-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .75s cubic-bezier(.2,.8,.2,1)}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;border:0;text-align:left;width:100%}
+.face.front{background:#000;color:#fff}
+.face.front b{display:block;margin-bottom:8px;font:900 1.7rem/1 var(--display);text-transform:uppercase;color:var(--mint)}
+.face.front em{display:block;font-style:normal;color:var(--muted);font-size:.9rem}
+.face.front .pulse{height:46px;display:flex;align-items:flex-end;gap:3px}
+.face.front .pulse i{flex:1;background:var(--mint);height:30%;animation:eq 1.1s infinite ease-in-out}
+.face.back{transform:rotateY(180deg);background:#fff;color:#000;gap:10px;justify-content:flex-start}
+.face.back p{font-size:.92rem;margin:0}
+.face.back .btn{margin-top:auto;align-self:flex-start}
+
+/* ---------- before/after ---------- */
+.ba{position:relative;border-radius:16px;overflow:hidden;border:1.5px solid #000;aspect-ratio:16/9;background:#000;user-select:none;touch-action:pan-y}
+.ba svg{position:absolute;inset:0;width:100%;height:100%}
+.ba .after{clip-path:inset(0 0 0 var(--pos,50%))}
+.ba .handle{position:absolute;top:0;bottom:0;left:var(--pos,50%);width:4px;margin-left:-2px;background:var(--mint);z-index:3;pointer-events:none}
+.ba .handle::after{content:"↔";position:absolute;top:50%;left:50%;width:44px;height:44px;margin:-22px;border-radius:50%;background:var(--mint);color:#000;display:grid;place-items:center;font-weight:800}
+.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;z-index:4;margin:0}
+.ba .cap{position:absolute;bottom:12px;z-index:2;font:700 .8rem/1 var(--body);background:#000;color:var(--mint);padding:7px 12px;border-radius:999px}
+
+/* ---------- timeline cards ---------- */
+.tl{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+.tl .it{border-top:4px solid #000;padding-top:12px}
+.tl .it b{font:800 1.35rem/1 var(--display);display:block;margin-bottom:6px}
+
+/* ---------- AI ---------- */
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0 26px;counter-reset:p}
+.pipe div{position:relative;border:1.5px solid var(--line);border-radius:12px;padding:14px 12px;font-size:.86rem;line-height:1.35;transition:all .35s;opacity:.55}
+.pipe div b{display:block;font-size:.95rem;margin-bottom:4px}
+.pipe div.lit{opacity:1;border-color:var(--mint);background:rgb(134 232 176 / .14);transform:translateY(-4px)}
+.pipe div.lit.last{border-color:var(--red);background:rgb(255 59 48 / .14)}
+#roll{width:100%;height:210px;display:block;border-radius:10px;background:#000;border:1px solid var(--line)}
+input[type=text]{width:100%;background:#000;color:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font:inherit}
+input[type=text]:focus{border-color:var(--mint);outline:none}
+.note{font-size:.85rem;color:var(--muted);border-left:3px solid var(--red);padding:2px 0 2px 12px;margin-top:14px;max-width:70ch}
+
+/* ---------- tabs / pros-cons ---------- */
+.tabs{display:flex;gap:8px;margin-bottom:22px}
+.tabs button{flex:1;border:1.5px solid var(--line);background:transparent;border-radius:14px;padding:16px;font:800 1.1rem/1 var(--display);text-transform:uppercase;transition:all .2s}
+.tabs button[aria-selected="true"].ok{background:var(--mint);color:#000;border-color:var(--mint)}
+.tabs button[aria-selected="true"].bad{background:var(--red);color:#fff;border-color:var(--red)}
+.cards[hidden]{display:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:20px;will-change:transform;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s ease-out}
+.card h3{margin-bottom:6px}
+.card .tagline{font:800 1.8rem/1 var(--display);color:var(--mint);margin-bottom:8px}
+.bad-t .card .tagline{color:var(--red)}
+.card p{font-size:.95rem;margin:0}
+.charts{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;margin-top:30px}
+#linechart{width:100%;height:auto;display:block}
+.donuts{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center}
+.donuts svg{width:100%;height:auto;max-width:170px;margin:0 auto;display:block}
+.donuts .dn{font:800 1.45rem/1 var(--display)}
+.donuts small{display:block;color:var(--muted);font-size:.8rem;line-height:1.3;margin-top:4px}
+.ring-bg{stroke:rgb(255 255 255 / .12)}
+.ring{transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- poll / quiz ---------- */
+.opts{display:grid;gap:10px}
+.opt{text-align:left;border:1.5px solid var(--line);background:transparent;border-radius:12px;padding:14px 16px;font-weight:600;position:relative;overflow:hidden;transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--mint)}
+.opt .pf{position:absolute;inset:0 auto 0 0;width:0;background:rgb(134 232 176 / .22);transition:width 1s;z-index:0}
+.opt span{position:relative;z-index:1;display:flex;justify-content:space-between;gap:12px}
+.opt.right{border-color:var(--mint);background:rgb(134 232 176 / .2)}
+.opt.wrong{border-color:var(--red);background:rgb(255 59 48 / .18)}
+.quiz-top{display:flex;justify-content:space-between;font-size:.9rem;color:var(--muted);margin-bottom:10px}
+.qbar{height:6px;border-radius:6px;background:rgb(255 255 255 / .14);overflow:hidden;margin-bottom:22px}
+.qbar i{display:block;height:100%;width:0;background:var(--mint);transition:width .4s}
+.q-text{font:800 clamp(1.25rem,2.6vw,1.7rem)/1.2 var(--display);text-transform:uppercase;margin-bottom:20px}
+.q-exp{min-height:3em;margin-top:16px;font-size:.95rem}
+.score{font:900 clamp(3rem,10vw,6rem)/1 var(--display);color:var(--mint)}
+
+/* ---------- project info ---------- */
+.info-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.info-grid .c4{grid-column:span 4}.info-grid .c6{grid-column:span 6}.info-grid .c8{grid-column:span 8}.info-grid .c12{grid-column:span 12}
+.info-grid .panel h3{font:800 1rem/1.2 var(--display);text-transform:uppercase;margin-bottom:10px}
+.info-grid ol,.info-grid ul{margin:0;padding-left:1.2em}
+.info-grid li{margin-bottom:.35em}
+.idcard{background:#000;color:#fff;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:14px;justify-content:space-between}
+.idcard img{height:48px;width:auto;filter:brightness(0) invert(1)}
+.idcard .who{font:800 1.5rem/1.1 var(--display);text-transform:uppercase;color:var(--mint)}
+.idcard small{color:rgb(255 255 255 / .7);font-size:.88rem;display:block}
+
+/* ---------- conclusion ---------- */
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}
+.three .panel b{font:800 1.3rem/1.1 var(--display);text-transform:uppercase;display:block;margin-bottom:8px;color:var(--mint)}
+.big-quote{font:800 clamp(1.5rem,3.6vw,2.6rem)/1.12 var(--display);text-transform:uppercase;max-width:22ch;margin:40px 0 0}
+
+/* ---------- sources / footer ---------- */
+.sources ol{padding-left:1.3em;font-size:.92rem;color:var(--muted)}
+.sources li{margin-bottom:.55em;max-width:100ch}
+.sources a{word-break:break-all}
+footer{background:var(--mint);color:#000;padding:56px 0 calc(40px + var(--safe-b))}
+footer .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
+footer img{height:64px;width:auto;filter:brightness(0)}
+footer a{color:#000;font-weight:600}
+footer p{margin-bottom:.4em}
+footer .small{font-size:.85rem;opacity:.75;margin-top:18px}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .cols,.cols.wide-l,.cols.wide-r,.era,.charts,footer .fgrid{grid-template-columns:1fr}
+  .info-grid .c4,.info-grid .c6,.info-grid .c8{grid-column:span 12}
+  .pipe{grid-template-columns:1fr 1fr}
+  .three,.tl{grid-template-columns:1fr}
+  .knobs{grid-template-columns:1fr}
+  .chap{padding:80px 0 70px}
+  .top .brand span{display:none}
+  .bar-row{grid-template-columns:100px 1fr}
+  .axis{margin-left:112px}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .vs{grid-template-columns:1fr}
+  .seq-row{grid-template-columns:1fr}
+  .steps{gap:3px}
+  .chap-head{grid-template-columns:1fr}
+  .tabs{flex-direction:column}
+  .donuts{grid-template-columns:1fr 1fr}
+  .hero{padding-top:300px;align-items:flex-end}
+}
+
+</style>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div>
+
+<header class="top" id="topbar">
+  <a class="brand" href="#top" aria-label="На початок">
+    <img src="data:image/png;base64,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" data-logo="1" alt="ОПЛ «Гармонія»">
+    <span>Електронна музика</span>
+  </a>
+  <div class="tools">
+    <button class="pill" id="soundBtn" title="Зупинити всі звуки й ефекти (Esc)"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="soundTxt">■ Стоп усе</span></button>
+    <button class="pill" id="tocBtn" aria-haspopup="dialog">Зміст</button>
+  </div>
+</header>
+
+<nav id="toc" role="dialog" aria-label="Зміст" aria-modal="true">
+  <button class="pill close" id="tocClose">Закрити</button>
+  <div class="wrap">
+    <h2 class="d">Зміст</h2>
+    <ol>
+      <li><a href="#s1"><b>1.</b>Що таке звук?</a></li>
+      <li><a href="#s2"><b>2.</b>Що таке електронна музика?</a></li>
+      <li><a href="#s3"><b>3.</b>Як розвивалася електронна музика?</a></li>
+      <li><a href="#s4"><b>4.</b>Телармоніум — один із перших електронних музичних інструментів</a></li>
+      <li><a href="#s5"><b>5.</b>Терменвокс — музика без дотику</a></li>
+      <li><a href="#s6"><b>6.</b>Траутоніум — новий спосіб керування електронним звуком</a></li>
+      <li><a href="#s7"><b>7.</b>Мелотрон — крок до семплювання</a></li>
+      <li><a href="#s8"><b>8.</b>Moog і «Switched-On Bach»</a></li>
+      <li><a href="#s9"><b>9.</b>Драм-машини та MIDI</a></li>
+      <li><a href="#s10"><b>10.</b>Нові музичні жанри</a></li>
+      <li><a href="#s11"><b>11.</b>Комп’ютер і домашня студія</a></li>
+      <li><a href="#s12"><b>12.</b>Біллі Айліш: музика зі спальні до «Греммі»</a></li>
+      <li><a href="#s13"><b>13.</b>Як ШІ створює музику</a></li>
+      <li><a href="#s14"><b>14.</b>Проблеми ШІ-музики</a></li>
+      <li><a href="#s15"><b>15.</b>Висновок</a></li>
+      <li><a href="#project"><b>i</b>Інформація про проєкт</a></li>
+      <li><a href="#sources"><b>№</b>Джерела</a></li>
+    </ol>
+  </div>
+</nav>
+
+<div id="miniPlayer" role="status" aria-live="polite"><span id="miniTxt">Грає ритм</span><button id="miniStop">Стоп</button></div>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <canvas id="heroCanvas" aria-label="3D-платівка, що обертається. Потягни, щоб покрутити"></canvas>
+  <div class="wrap in">
+    <h1 class="d warp" id="heroTitle">Як розвиток технологій змінив електронну музику?</h1>
+    <p class="sub">Від перших електронних інструментів до сучасних технологій</p>
+    <div class="by">
+      <span>Підготувала: учениця 11-А класу ОПЛ «Гармонія»</span>
+      <b>Косьянова Аліка</b>
+      <span>Керівник: Мушинський А.В.</span>
+    </div>
+    <div class="cta">
+      <button class="btn" id="heroPlay">▶ Увімкнути музику</button>
+      <a class="btn ghost" href="#project">Про проєкт</a>
+      <a class="btn ghost" href="#s1">Почати подорож</a>
+    </div>
+  </div>
+  <div class="hint">Потягни платівку · усі інструменти на сайті грають по-справжньому</div>
+</section>
+
+<div class="zebra tall" aria-hidden="true"></div>
+
+<!-- ================= PROJECT INFO ================= -->
+<section class="chap mint" id="project">
+  <div class="wrap">
+    <div class="chap-head">
+      <div class="n" aria-hidden="true">i</div>
+      <h2 class="d warp">Інформація про проєкт</h2>
+    </div>
+    <div class="info-grid">
+      <div class="c4 idcard">
+        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-logo="1" alt="ОПЛ «Гармонія»">
+        <div>
+          <small>Підготувала</small>
+          <div class="who">Косьянова Аліка</div>
+          <small>учениця 11-А класу ОПЛ «Гармонія»</small>
+        </div>
+        <div>
+          <small>Керівник проєкту</small>
+          <b>Мушинський А.В.</b>
+        </div>
+        <small>Семестровий проєкт · 11 клас · І семестр 2026–2027 н. р.</small>
+      </div>
+      <div class="c8 panel">
+        <h3>Тема</h3>
+        <p class="lead" style="margin-bottom:.4em"><b>Як розвиток технологій змінив електронну музику?</b></p>
+        <p>Від перших електронних інструментів до MIDI, комп’ютера та штучного інтелекту.</p>
+        <h3 style="margin-top:18px">Актуальність</h3>
+        <p>Сьогодні музику створюють на ноутбуках і смартфонах, а іноді — за текстовим запитом до штучного інтелекту. Щоб зрозуміти, куди рухається музика, варто побачити, як технології змінювали її від кінця XIX століття.</p>
+      </div>
+      <div class="c6 panel">
+        <h3>Мета</h3>
+        <p>Дослідити, як розвиток технологій — від перших електронних інструментів до штучного інтелекту — змінив звучання електронної музики та сам спосіб її створення.</p>
+        <h3 style="margin-top:18px">Проблемне питання</h3>
+        <p>Технології змінюють лише звук чи й роль людини в музиці?</p>
+        <h3 style="margin-top:18px">Гіпотеза</h3>
+        <p>Кожен технологічний стрибок робив створення музики доступнішим, а роль людини поступово зміщувалась від виконавця до автора ідеї.</p>
+      </div>
+      <div class="c6 panel">
+        <h3>Завдання</h3>
+        <ol>
+          <li>З’ясувати, що таке звук і електронна музика.</li>
+          <li>Простежити ключові етапи: Телармоніум, терменвокс, траутоніум, мелотрон, Moog, драм-машини, MIDI.</li>
+          <li>Показати, як комп’ютер і домашня студія змінили доступ до творчості.</li>
+          <li>Розглянути, як ШІ створює музику, і які успіхи та проблеми з цим пов’язані.</li>
+          <li>Створити практичний продукт — інтерактивний сайт.</li>
+        </ol>
+      </div>
+      <div class="c6 panel">
+        <h3>Методи</h3>
+        <ul>
+          <li>аналіз джерел та фактів;</li>
+          <li>хронологічний аналіз (стрічка часу);</li>
+          <li>порівняння епох, інструментів і вартості входу в музику;</li>
+          <li>моделювання: інтерактивні демонстрації звуку.</li>
+        </ul>
+      </div>
+      <div class="c6 panel dark">
+        <h3 style="color:var(--mint)">Практичний продукт</h3>
+        <p>Цей сайт. У ньому можна самому зіграти на терменвоксі, траутоніумі, мелотроні та Moog, зібрати ритм на драм-машині, побачити MIDI-повідомлення, пройти вікторину й проголосувати за власну думку про ШІ-музику.</p>
+        <p style="margin:0;font-size:.9rem;color:rgb(255 255 255 / .7)">Порада: відкривай розділи по порядку — і вмикай звук.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="zebra" aria-hidden="true"></div>
+
+<!-- ================= 1 SOUND ================= -->
+<section class="chap" id="s1">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">1</div><h2 class="d warp">Що таке звук?</h2></div>
+    <div class="cols wide-l">
+      <div class="stack">
+        <p class="lead">Звук — це коливання повітря, які наші вуха перетворюють на сигнал для мозку. Усе, що ми чуємо в музиці, описують три властивості.</p>
+        <div class="panel"><h3>Висота = частота</h3><p>Скільки коливань за секунду. Вимірюється в герцах (Гц). Більше коливань — вищий звук.</p></div>
+        <div class="panel"><h3>Гучність = амплітуда</h3><p>Наскільки сильно «розгойдується» хвиля. Більша хвиля — гучніший звук.</p></div>
+        <div class="panel"><h3>Тембр = форма хвилі</h3><p>Саме форма хвилі відрізняє скрипку від флейти. Електронні інструменти вміють будувати будь-яку форму.</p></div>
+      </div>
+      <div class="demo">
+        <div class="label">Лабораторія звуку · потягни 3D-хвилю, щоб покрутити</div>
+        <canvas id="labCanvas"></canvas>
+        <div class="row" style="margin-top:14px">
+          <div class="seg" id="waveSeg" role="group" aria-label="Форма хвилі">
+            <button data-w="sine" aria-pressed="true">Синус</button>
+            <button data-w="square" aria-pressed="false">Квадрат</button>
+            <button data-w="sawtooth" aria-pressed="false">Пила</button>
+            <button data-w="triangle" aria-pressed="false">Трикутник</button>
+          </div>
+          <button class="btn sm" id="labPlay">▶ Звучати</button>
+        </div>
+        <div class="readout" id="labRead">440 Гц · Ля4</div>
+        <p class="muted-t" id="labWaveInfo" style="font-size:.92rem;margin:0 0 6px">Синус — найчистіший звук, без додаткових обертонів.</p>
+        <div class="ctl"><label for="labFreq">Висота (частота)<output id="labFreqO"></output></label><input id="labFreq" type="range" min="0" max="1000" value="600"></div>
+        <div class="ctl"><label for="labVol">Гучність (амплітуда)<output id="labVolO"></output></label><input id="labVol" type="range" min="0" max="100" value="45"></div>
+        <canvas id="labScope" class="scope" height="90" style="height:90px"></canvas>
+        <div class="hear" aria-hidden="true"><i id="hearMark" style="left:50%"></i><small style="left:6px">20 Гц</small><small style="right:6px">20 000 Гц</small></div>
+        <p class="src">Людина чує приблизно від 20 до 20 000 Гц. Біла позначка показує, де на цій шкалі твоя нота.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2 WHAT IS EM ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap mint" id="s2">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">2</div><h2 class="d warp">Що таке електронна музика?</h2></div>
+    <p class="lead">Електронна музика — це музика, у якій звук створюють або суттєво змінюють електронні пристрої: генератори, фільтри, підсилювачі, комп’ютери.</p>
+    <p>Натискай на блоки: так виглядає шлях сигналу в майже будь-якому синтезаторі.</p>
+    <div class="chain" id="chain" role="group" aria-label="Шлях сигналу">
+      <button aria-pressed="true" data-i="0"><b>Генератор</b><span>створює хвилю</span></button>
+      <button aria-pressed="false" data-i="1"><b>Фільтр</b><span>змінює тембр</span></button>
+      <button aria-pressed="false" data-i="2"><b>Підсилювач</b><span>керує гучністю</span></button>
+      <button aria-pressed="false" data-i="3"><b>Динамік</b><span>перетворює на звук</span></button>
+    </div>
+    <p class="chain-info" id="chainInfo"></p>
+    <div class="vs">
+      <div><h3>Акустичний інструмент</h3><ul><li>звук народжується від струни, повітря, шкіри</li><li>тембр обмежений будовою корпусу</li><li>керують руками й диханням</li></ul></div>
+      <div><h3>Електронний інструмент</h3><ul><li>звук народжується з електричного сигналу</li><li>тембр можна будувати з нуля</li><li>керують клавішами, ручками, кодом і навіть ШІ</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3 DEVELOPMENT ================= -->
+<section class="chap" id="s3">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">3</div><h2 class="d warp">Як розвивалася електронна музика?</h2></div>
+    <p class="lead">Рухай повзунок крізь 130 років. Хвиля на екрані змінює форму разом із технологіями, а червоний колір підкаже, де починається епоха ШІ.</p>
+    <div class="era" style="margin-top:26px">
+      <div>
+        <canvas id="eraCanvas"></canvas>
+        <div class="eraTrack">
+          <input id="eraRange" type="range" min="0" max="7" step="1" value="0" aria-label="Епоха">
+          <div class="eraDots" id="eraDots"></div>
+        </div>
+      </div>
+      <div class="panel era-card" aria-live="polite">
+        <div class="yr" id="eraYr"></div>
+        <div class="nm" id="eraNm"></div>
+        <dl>
+          <div><dt>Що змінилося</dt><dd id="eraWhat"></dd></div>
+          <div><dt>Хто створює музику</dt><dd id="eraWho"></dd></div>
+          <div><dt>Доступність (ілюстративна шкала)</dt><dd><div class="meter"><i id="eraMeter"></i></div></dd></div>
+        </dl>
+        <div class="row" style="margin-top:auto">
+          <button class="btn sm" id="eraHear">♪ Почути епоху</button>
+          <button class="btn sm ghost" id="eraAuto">Автоподорож</button>
+          <a class="btn sm ghost" id="eraGo" href="#s4">До розділу</a>
+        </div>
+      </div>
+    </div>
+    <p class="src">Шкала доступності — авторська ілюстрація тенденції, а не статистика. Звуки в кнопці «Почути епоху» — спрощена імітація тембру, а не архівні записи.</p>
+  </div>
+</section>
+
+<!-- ================= 4 TELHARMONIUM ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap mint" id="s4">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">4</div><h2 class="d warp">Телармоніум — один із перших електронних музичних інструментів</h2></div>
+    <div class="cols">
+      <div class="stack">
+        <p class="lead">1897 року Таддеус Кейгіл запатентував Телармоніум. Версія 1906 року важила майже 200 тонн, а музику слухачам передавали телефонними дротами.</p>
+        <p>Це була ідея, дуже схожа на сучасний стрімінг: музика приходить до людини «по дроту», а не з оркестру в залі. Але інструмент був величезним і дорогим в обслуговуванні.</p>
+        <div class="facts">
+          <div class="fact"><b>1897</b><span>рік патенту</span></div>
+          <div class="fact"><b>≈ 200 т</b><span>вага версії 1906 року</span></div>
+        </div>
+        <p class="src">Джерело: Telharmonium — Вікіпедія.</p>
+      </div>
+      <div class="demo">
+        <div class="label">Зрівноваж Телармоніум</div>
+        <div class="balance-wrap">
+          <svg id="balance" viewBox="0 0 420 250" role="img" aria-label="Терези: Телармоніум проти слонів">
+            <g id="beam" style="transform-origin:210px 70px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)">
+              <rect x="30" y="66" width="360" height="8" rx="4" fill="#000"/>
+              <line x1="50" y1="70" x2="50" y2="140" stroke="#000" stroke-width="2"/>
+              <line x1="370" y1="70" x2="370" y2="140" stroke="#000" stroke-width="2"/>
+              <g id="panL" transform="translate(0,0)">
+                <rect x="10" y="140" width="80" height="10" rx="5" fill="#000"/>
+                <rect x="22" y="104" width="56" height="36" fill="#000"/><text x="50" y="127" text-anchor="middle" font-size="10" font-weight="800" fill="#86E8B0">200 т</text>
+                <text x="50" y="98" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Телармоніум</text>
+              </g>
+              <g id="panR">
+                <rect x="330" y="140" width="80" height="10" rx="5" fill="#000"/>
+                <text id="elephants" x="370" y="134" text-anchor="middle" font-size="20" font-weight="700" fill="#000"></text>
+              </g>
+            </g>
+            <polygon points="210,72 190,220 230,220" fill="#000"/>
+            <rect x="160" y="220" width="100" height="10" rx="5" fill="#000"/>
+          </svg>
+        </div>
+        <div class="ctl"><label for="elRange">Додай африканських слонів (≈ 5 т кожен)<output id="elO">0</output></label><input id="elRange" type="range" min="0" max="50" value="0"></div>
+        <p id="balMsg" style="margin:0;font-weight:600">Шукай рівновагу: слонів потрібно ще багато.</p>
+        <p class="src">Для порівняння: 200 тонн — приблизно мільйон смартфонів по 200 г.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5 THEREMIN ================= -->
+<section class="chap" id="s5">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">5</div><h2 class="d warp">Терменвокс — музика без дотику</h2></div>
+    <div class="cols wide-r">
+      <div class="stack">
+        <p class="lead">У жовтні 1920 року Лев Термен винайшов терменвокс — інструмент, на якому грають, не торкаючись його.</p>
+        <p>Рука змінює електричне поле навколо антен: поряд із вертикальною антеною звук стає вищим, поряд із петлею — тихішим. Тому виконавець ніби «ліпить» музику з повітря.</p>
+        <div class="facts">
+          <div class="fact"><b>1920</b><span>винахід терменвокса</span></div>
+          <div class="fact"><b>1929</b><span>RCA почала випуск, але біржовий крах зруйнував продажі</span></div>
+        </div>
+        <p class="src">Джерело: Theremin — Вікіпедія.</p>
+      </div>
+      <div class="demo">
+        <div class="label">Грай без кліків: просто рухай курсором (на телефоні — пальцем)</div>
+        <canvas id="thereminPad"></canvas>
+        <div class="row" style="margin-top:14px"><button class="btn sm" id="thBtn">▶ Увімкнути терменвокс</button><span class="readout" id="thRead" style="font-size:1.1rem;margin:0">— Гц</span></div>
+        <p class="src">Вправо — вища нота. Вгору — гучніше. Внизу — тиша, як біля петлі справжнього терменвокса.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6 TRAUTONIUM ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap mint" id="s6">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">6</div><h2 class="d warp">Траутоніум — новий спосіб керування електронним звуком</h2></div>
+    <div class="cols">
+      <div class="stack">
+        <p class="lead">Траутоніум створив Фрідріх Траутвайн у Берліні наприкінці 1920-х. Замість клавіш — провідна стрічка: де натиснув пальцем, там і звучить нота.</p>
+        <p>Стрічка дає плавну зміну висоти й живий тембр. Згодом Оскар Сала удосконалив інструмент (Mixtur-Trautonium) і додав «підтони» — нижчі звуки, що збагачують тембр. Для фільму Гічкока «Птахи» (1963) саме на траутоніумі створювали звуки птахів.</p>
+        <p class="src">Джерело: Trautonium — Вікіпедія.</p>
+      </div>
+      <div class="demo">
+        <div class="label">Затисни стрічку й веди пальцем</div>
+        <div class="ribbon" id="ribbon" aria-label="Стрічка траутоніума"><div class="dot" id="ribDot"></div><span class="lbl" style="left:14px">низько</span><span class="lbl" style="right:14px">високо</span></div>
+        <div class="row" style="margin-top:14px">
+          <div class="seg" id="subSeg" role="group" aria-label="Підтони"><button aria-pressed="false" id="subBtn">Підтони: вимк.</button></div>
+          <span class="readout" id="trRead" style="font-size:1.1rem;margin:0">—</span>
+        </div>
+        <div class="ctl"><label for="trCut">Фільтр (яскравість тембру)<output id="trCutO"></output></label><input id="trCut" type="range" min="0" max="100" value="55"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7 MELLOTRON ================= -->
+<section class="chap" id="s7">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">7</div><h2 class="d warp">Мелотрон — крок до семплювання</h2></div>
+    <div class="cols wide-r">
+      <div class="stack">
+        <p class="lead">У мелотрона кожна клавіша запускає окрему смужку магнітної стрічки із записаним звуком: флейти, струнних, хору.</p>
+        <p>Це вже не синтез, а відтворення записаного — прабатько сучасного семплера. Але стрічка тривала лише близько восьми секунд: потім нота «закінчувалась», і клавішу треба було відпускати й натискати знову.</p>
+        <p>Мелотрон чути у The Beatles у пісні «Strawberry Fields Forever» (1966): вступ звучить саме з нього.</p>
+        <p class="src">Джерело: Mellotron — Вікіпедія. Тут звук — імітація: прості хвилі з повільною атакою.</p>
+      </div>
+      <div class="demo">
+        <div class="label">Натисни клавішу й стеж за стрічкою</div>
+        <div class="kbwrap"><div class="kb" id="kbMel"></div></div>
+        <div class="tape"><div class="reel" id="melReel"></div><div class="prog"><i id="melProg"></i></div><span class="muted-t" id="melMsg" style="font-size:.85rem">Стрічка на кожну клавішу — приблизно 8 секунд.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8 MOOG ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap mint" id="s8">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">8</div><h2 class="d warp">Moog і «Switched-On Bach»</h2></div>
+    <div class="cols wide-l">
+      <div class="stack">
+        <p class="lead">1964 року Роберт Муг створив синтезатор, у якому звук керується напругою. Музикант уперше міг сам «ліпити» тембр ручками.</p>
+        <p>1968 року Венді Карлос записала на Moog альбом «Switched-On Bach». Він отримав три премії «Греммі» і став першим платиновим класичним альбомом. Синтезатор перестав бути лабораторною дивиною й вийшов до масового слухача.</p>
+        <div class="facts">
+          <div class="fact"><b>1964</b><span>синтезатор Moog із керуванням напругою</span></div>
+          <div class="fact"><b>3</b><span>премії «Греммі» за «Switched-On Bach»</span></div>
+        </div>
+        <p class="src">Джерело: Moog synthesizer — Вікіпедія.</p>
+      </div>
+      <div class="demo">
+        <div class="label">Мінісинтезатор · грай мишею або клавішами A W S E D F T G Y H U J K</div>
+        <div class="seg" id="moogWave" role="group" aria-label="Форма хвилі Moog">
+          <button data-w="sawtooth" aria-pressed="true">Пила</button><button data-w="square" aria-pressed="false">Квадрат</button><button data-w="triangle" aria-pressed="false">Трикутник</button>
+        </div>
+        <div class="knobs">
+          <div class="ctl"><label for="mCut">Зріз фільтра<output id="mCutO"></output></label><input id="mCut" type="range" min="0" max="1000" value="620"></div>
+          <div class="ctl"><label for="mRes">Резонанс<output id="mResO"></output></label><input id="mRes" type="range" min="0" max="20" value="6"></div>
+          <div class="ctl"><label for="mSw">Свіп (відкриття фільтра)<output id="mSwO"></output></label><input id="mSw" type="range" min="0" max="100" value="40"></div>
+        </div>
+        <canvas id="filtCanvas"></canvas>
+        <p class="src" style="margin:8px 0 14px">Крива показує, які частоти фільтр пропускає. Піднімай резонанс і слухай «співучий» звук.</p>
+        <div class="kbwrap"><div class="kb tall" id="kbMoog"></div></div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn sm dark" id="bachBtn">▶ Зіграти Баха на цьому Moog</button>
+          <div class="seg" id="moogPre"><button data-p="bass" aria-pressed="false">Бас</button><button data-p="lead" aria-pressed="false">Соло</button><button data-p="pad" aria-pressed="false">Пад</button></div>
+        </div>
+        <p class="src">Фрагмент — початок Прелюдії до мажор Баха (твір у суспільному надбанні), зіграний твоїми налаштуваннями.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 9 DRUMS + MIDI ================= -->
+<section class="chap" id="s9">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">9</div><h2 class="d warp">Драм-машини та MIDI</h2></div>
+    <div class="cols">
+      <div class="stack">
+        <p class="lead">1980 року Roland випустила драм-машину TR-808. Вона коштувала $1 195 і розійшлась накладом менше ніж 12 000 штук, але стала основою хіп-хопу й електроніки.</p>
+        <p>1983 року з’явився стандарт MIDI — спільна «мова» для електронних інструментів. Того ж року вийшов синтезатор Yamaha DX7: за три роки його продали у 200 000 екземплярів.</p>
+        <div class="bars-chart" id="chartUnits"></div>
+        <p class="src">Тираж, штук. Джерела: Roland TR-808, MIDI — Вікіпедія.</p>
+      </div>
+      <div class="demo">
+        <div class="label">Драм-машина · клікай по кроках</div>
+        <div class="seq" id="seq"></div>
+        <div class="row" style="margin-top:16px">
+          <button class="btn sm" id="seqPlay">▶ Грати</button>
+          <div class="seg" id="seqPre" role="group" aria-label="Пресети"></div>
+        </div>
+        <div class="ctl"><label for="seqBpm">Темп<output id="seqBpmO"></output></label><input id="seqBpm" type="range" min="70" max="160" value="124"></div>
+      </div>
+    </div>
+    <div class="demo" style="margin-top:34px">
+      <div class="label">MIDI-монітор · ті самі ноти керують різними інструментами</div>
+      <div class="cols wide-l" style="gap:26px">
+        <div>
+          <div class="seg" id="midiInst" role="group" aria-label="Інструмент" style="margin-bottom:12px">
+            <button data-i="piano" aria-pressed="true">Піаніно</button><button data-i="bass" aria-pressed="false">Бас</button><button data-i="organ" aria-pressed="false">Орган</button>
+          </div>
+          <div class="kbwrap"><div class="kb" id="kbMidi"></div></div>
+          <div class="ctl"><label for="midiVel">Швидкість натискання (velocity)<output id="midiVelO"></output></label><input id="midiVel" type="range" min="1" max="127" value="100"></div>
+          <div class="row"><button class="btn sm ghost" id="midiConnect">Підключити свою MIDI-клавіатуру</button><span class="muted-t" id="midiStatus" style="font-size:.85rem"></span></div>
+        </div>
+        <div>
+          <div class="midilog" id="midiLog" aria-live="off"><div>Натисни клавішу…</div></div>
+          <div class="facts" style="margin-top:16px">
+            <div class="fact"><b>128</b><span>нот (від 0 до 127)</span></div>
+            <div class="fact"><b>16</b><span>каналів</span></div>
+          </div>
+          <p class="src">Червоним — байти повідомлення у шістнадцятковій системі. MIDI передає не звук, а команди: яку ноту й з якою силою натиснули.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 10 GENRES ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap mint" id="s10">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">10</div><h2 class="d warp">Нові музичні жанри</h2></div>
+    <p class="lead">Синтезатори, драм-машини й MIDI породили цілі жанри. Перевертай картки й запускай їхній характерний ритм на драм-машині.</p>
+    <div class="genres" id="genres"></div>
+    <h3 style="margin:42px 0 14px">Темп жанрів, ударів на хвилину (орієнтовно)</h3>
+    <div class="bars-chart" id="chartBpm"></div>
+    <div class="axis" aria-hidden="true"><span>60</span><span>90</span><span>120</span><span>150</span><span>180</span></div>
+    <p class="src">Діапазони темпу наближені: у кожному жанрі є винятки. Джерела: сторінки Вікіпедії про House music, Techno, Trance music, Synth-pop, EDM.</p>
+  </div>
+</section>
+
+<!-- ================= 11 COMPUTER ================= -->
+<section class="chap" id="s11">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">11</div><h2 class="d warp">Комп’ютер і домашня студія</h2></div>
+    <p class="lead">Раніше для запису потрібна була студія з кімнатою обладнання. Комп’ютер уклав її в ноутбук. Тягни повзунок і порівнюй.</p>
+    <div class="ba" id="ba" style="--pos:50%;margin:26px 0">
+      <svg class="before" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="800" height="450" fill="#111"/>
+        <g id="racks"></g>
+        <text x="30" y="52" fill="#86E8B0" font-family="Tektur,sans-serif" font-weight="800" font-size="26">СТУДІЯ 1980-х</text>
+      </svg>
+      <svg class="after" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="800" height="450" fill="#86E8B0"/>
+        <rect x="200" y="120" width="400" height="240" rx="14" fill="#000"/>
+        <rect x="216" y="136" width="368" height="208" rx="6" fill="#0d0d0d"/>
+        <g id="daw"></g>
+        <path d="M150 372h500l-34 40H184z" fill="#000"/>
+        <text x="770" y="52" text-anchor="end" fill="#000" font-family="Tektur,sans-serif" font-weight="800" font-size="26">НОУТБУК 2020-х</text>
+      </svg>
+      <div class="handle"></div>
+      <input id="baRange" type="range" min="0" max="100" value="50" aria-label="Порівняти студії">
+    </div>
+    <div class="cols">
+      <div>
+        <div class="tl" style="grid-template-columns:1fr">
+          <div class="it" style="border-top-color:var(--mint)"><b>18.12.1997 · FruityLoops</b>Дідьє Дамбрен із Бельгії, якому було 19 років, випустив програму, яку сьогодні знають як FL Studio.</div>
+          <div class="it" style="border-top-color:var(--mint)"><b>30.10.2001 · Ableton Live</b>Комп’ютер став інструментом для живих виступів, а не лише для запису.</div>
+          <div class="it" style="border-top-color:var(--mint)"><b>2007 · Soulja Boy</b>Хіт №1 зроблено на пробній версії FL Studio.</div>
+        </div>
+        <p class="src">Джерела: FL Studio, Ableton Live — Вікіпедія.</p>
+      </div>
+      <div>
+        <h3 style="margin-bottom:14px">Скільки коштував вхід у музику, $ (орієнтовно)</h3>
+        <div class="bars-chart" id="chartCost"></div>
+        <p class="src">TR-808 — $1 195 (1980). DX7 — близько $2 000 (1983). Logic Pro X — близько $200 (2020). Для ШІ-сервісів часто є безкоштовний базовий рівень.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 12 BILLIE ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap mint" id="s12">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">12</div><h2 class="d warp">Біллі Айліш: музика зі спальні до «Греммі»</h2></div>
+    <div class="cols">
+      <div class="stack">
+        <p class="lead">26 січня 2020 року Біллі Айліш здобула «Греммі» в усіх чотирьох головних категоріях. Альбом записали в спальні її брата Фіннеаса в програмі Logic Pro X, яка коштує близько $200.</p>
+        <p>Це точка, у якій історія технологій зустрічається з історією людей. Те, що 1960-х вимагало лабораторії, а 1980-х — студії, у 2020-му виявилося доступним у кімнаті з ноутбуком.</p>
+        <p class="src">Джерело: Engadget, «Billie Eilish proved anyone can access Grammy-winning gear».</p>
+      </div>
+      <div class="demo" style="background:#000;color:#fff;border-color:#000">
+        <div class="label" style="color:var(--mint)">Спальня-студія</div>
+        <div class="facts" style="margin-top:0">
+          <div class="fact" style="border-color:var(--mint)"><b>$200</b><span style="color:var(--muted)">приблизна вартість програмного забезпечення</span></div>
+          <div class="fact" style="border-color:var(--mint)"><b>4</b><span style="color:var(--muted)">головні категорії «Греммі»</span></div>
+          <div class="fact" style="border-color:var(--mint)"><b>1</b><span style="color:var(--muted)">спальня замість студії</span></div>
+        </div>
+        <p style="margin:18px 0 0;color:var(--muted);font-size:.95rem">Технології не замінили талант. Вони прибрали бар’єр між ідеєю й слухачем.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 13 AI ================= -->
+<section class="chap" id="s13">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">13</div><h2 class="d warp">Як ШІ створює музику</h2></div>
+    <p class="lead">20 грудня 2023 року запрацював Suno: сервіс створює пісню з вокалом за текстовим запитом. Музичний ШІ вчиться на великій кількості записів і шукає закономірності: які ноти, ритми й тембри відповідають словам «сумна», «танцювальна», «космічна».</p>
+    <div class="pipe" id="pipe">
+      <div><b>1. Запит</b>Ти пишеш словами, яку музику хочеш.</div>
+      <div><b>2. Розуміння</b>Модель зіставляє слова зі стилями, які вона бачила.</div>
+      <div><b>3. Ідея</b>Обирає тональність, темп, мелодію, гармонію.</div>
+      <div><b>4. Звучання</b>Перетворює ідею на звук і вокал.</div>
+      <div class="last"><b>5. Трек</b>Готова композиція за секунди.</div>
+    </div>
+    <div class="demo">
+      <div class="label">Мінідемо: «запит → мелодія»</div>
+      <div class="cols wide-l" style="gap:24px">
+        <div>
+          <input type="text" id="aiPrompt" value="сумна ніч над Одесою" aria-label="Запит до генератора" maxlength="60">
+          <div class="row" style="margin:14px 0"><div class="seg" id="aiMood" role="group" aria-label="Настрій">
+            <button data-m="sad" aria-pressed="true">Сумна</button><button data-m="joy" aria-pressed="false">Радісна</button><button data-m="space" aria-pressed="false">Космічна</button><button data-m="tense" aria-pressed="false">Напружена</button>
+          </div></div>
+          <div class="row"><button class="btn sm" id="aiGen">Згенерувати</button><button class="btn sm ghost" id="aiPlay">▶ Слухати</button></div>
+          <p class="readout" id="aiInfo" style="font-size:1rem;margin-top:14px">—</p>
+        </div>
+        <canvas id="roll"></canvas>
+      </div>
+      <p class="note">Чесно про демо: це проста алгоритмічна модель на кількох правилах, а не нейромережа. Один запит дає ту саму мелодію. Справжній ШІ вчиться на мільйонах записів і створює живий звук та вокал, але ланцюжок той самий: запит → навчені закономірності → музика.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 14 PROBLEMS ================= -->
+<div class="zebra" aria-hidden="true"></div>
+<section class="chap" id="s14">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">14</div><h2 class="d warp">Проблеми ШІ-музики</h2></div>
+    <p class="lead">Нова технологія завжди приносить і користь, і ризики. Перемикай вкладки: це два боки однієї історії.</p>
+    <div class="tabs" role="tablist" style="margin-top:24px">
+      <button class="bad" role="tab" aria-selected="true" id="tabBad">Проблеми</button>
+      <button class="ok" role="tab" aria-selected="false" id="tabOk">Успіхи</button>
+    </div>
+    <div class="cards bad-t" id="cardsBad" role="tabpanel" aria-labelledby="tabBad">
+      <div class="card tilt"><div class="tagline">$150 000</div><h3>Авторське право</h3><p>У червні 2024 року RIAA подала позови проти Suno та Udio. Лейбли вимагали до $150 000 за кожен твір, на якому, за їхніми словами, навчалися моделі.</p></div>
+      <div class="card tilt"><div class="tagline">&gt; 50 %</div><h3>Потоп треків</h3><p>У червні 2026 року на Deezer майже 90 000 треків щодня створювали ШІ. Це понад половину нових завантажень.</p></div>
+      <div class="card tilt"><div class="tagline">85 %</div><h3>Шахрайство зі стрімами</h3><p>Deezer повідомляє, що до 85 % прослуховувань повністю ШІ-треків у 2025 році були шахрайськими.</p></div>
+      <div class="card tilt"><div class="tagline">Голос</div><h3>Чий це голос?</h3><p>2023 року вірусною стала пісня «Heart on My Sleeve» зі штучними голосами Дрейка й The Weeknd. Питання ідентичності артиста досі відкрите.</p></div>
+    </div>
+    <div class="cards" id="cardsOk" role="tabpanel" aria-labelledby="tabOk" hidden>
+      <div class="card tilt"><div class="tagline">Warner</div><h3>Ліцензовані моделі</h3><p>25 листопада 2025 року Warner Music уклала угоду із Suno: моделі стають ліцензованими, а артисти контролюють свій голос і образ.</p></div>
+      <div class="card tilt"><div class="tagline">The Beatles</div><h3>ШІ як реставратор</h3><p>Пісня «Now and Then» (2023) вийшла завдяки ШІ, що виділив голос Джона Леннона зі старого демозапису. Вона отримала «Греммі».</p></div>
+      <div class="card tilt"><div class="tagline">Ідея → трек</div><h3>Доступність</h3><p>Людина без нотної грамоти й інструментів може втілити ідею, зробити чернетку, перевірити настрій і вже потім покликати музикантів.</p></div>
+      <div class="card tilt"><div class="tagline">Помічник</div><h3>Інструменти для авторів</h3><p>ШІ допомагає розділяти доріжки, чистити шум, пропонувати акорди та автоматично зводити запис.</p></div>
+    </div>
+    <div class="charts">
+      <div class="panel">
+        <h3 style="margin-bottom:10px">Частка ШІ-треків у щоденних завантаженнях Deezer, %</h3>
+        <svg id="linechart" viewBox="0 0 560 280" role="img" aria-label="Графік зростання частки ШІ-треків з 10 до понад 50 відсотків"></svg>
+        <p class="src">Дані Deezer: січень 2025 — 10 %, квітень 2025 — 18 %, вересень 2025 — 28 %, листопад 2025 — 34 %, січень 2026 — 39 %, квітень 2026 — 44 %, червень 2026 — понад 50 %.</p>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:10px">Завантаження проти слухання</h3>
+        <div class="donuts" id="donuts"></div>
+        <p class="src">Більшість ШІ-треків майже ніхто не слухає: за даними Deezer, вони дають лише 1–3 % прослуховувань.</p>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:30px">
+      <h3 style="margin-bottom:6px">Твоя думка: чи вважаєш ти ШІ-музику справжньою музикою?</h3>
+      <div class="opts" id="poll"></div>
+      <p class="src" id="pollNote">Результати зберігаються лише на цьому пристрої.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 15 CONCLUSION ================= -->
+<div class="zebra tall" aria-hidden="true"></div>
+<section class="chap mint" id="s15">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">15</div><h2 class="d warp">Висновок</h2></div>
+    <p class="lead">Технології змінили не лише звук електронної музики, а й сам спосіб її створення.</p>
+    <div class="three">
+      <div class="panel"><b>Звук</b>Від 200-тонного Телармоніума до синтезатора, який можна було поставити на сцену: тембр став керованим.</div>
+      <div class="panel"><b>Доступ</b>MIDI, драм-машини, а потім комп’ютер зробили студію доступною вдома. Вхід у музику подешевшав у десятки разів.</div>
+      <div class="panel"><b>Автор</b>ШІ перетворює ідею на трек за секунди. Зростає значення людини, яка вирішує, що саме варто створювати, і відповідає за це.</div>
+    </div>
+    <p>Гіпотеза підтвердилась: кожен технологічний стрибок робив створення музики доступнішим, а роль людини зміщувалась від виконавця до автора ідеї. Складне питання сьогодні вже не «чи можна створити музику», а «що саме людина хоче сказати» і як чесно поділити авторство з алгоритмом.</p>
+    <div class="big-quote d">Інструменти змінюються. Потреба говорити звуком залишається.</div>
+
+    <div class="demo" style="margin-top:50px;background:#000;color:#fff;border-color:#000">
+      <div class="label" style="color:var(--mint)">Перевір себе</div>
+      <div id="quiz"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOURCES ================= -->
+<section class="chap sources" id="sources" style="padding-bottom:70px">
+  <div class="wrap">
+    <div class="chap-head"><div class="n" aria-hidden="true">№</div><h2 class="d warp">Джерела</h2></div>
+    <ol>
+      <li>Telharmonium — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Telharmonium" target="_blank" rel="noopener">en.wikipedia.org/wiki/Telharmonium</a></li>
+      <li>Theremin — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Theremin" target="_blank" rel="noopener">en.wikipedia.org/wiki/Theremin</a></li>
+      <li>Trautonium — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Trautonium" target="_blank" rel="noopener">en.wikipedia.org/wiki/Trautonium</a></li>
+      <li>Mellotron — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Mellotron" target="_blank" rel="noopener">en.wikipedia.org/wiki/Mellotron</a></li>
+      <li>Moog synthesizer — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Moog_synthesizer" target="_blank" rel="noopener">en.wikipedia.org/wiki/Moog_synthesizer</a></li>
+      <li>Roland TR-808 — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Roland_TR-808" target="_blank" rel="noopener">en.wikipedia.org/wiki/Roland_TR-808</a></li>
+      <li>MIDI — Вікіпедія, <a href="https://en.wikipedia.org/wiki/MIDI" target="_blank" rel="noopener">en.wikipedia.org/wiki/MIDI</a></li>
+      <li>FL Studio — Вікіпедія, <a href="https://en.wikipedia.org/wiki/FL_Studio" target="_blank" rel="noopener">en.wikipedia.org/wiki/FL_Studio</a></li>
+      <li>Ableton Live — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Ableton_Live" target="_blank" rel="noopener">en.wikipedia.org/wiki/Ableton_Live</a></li>
+      <li>Engadget, «Billie Eilish proved anyone can access Grammy-winning gear», <a href="https://www.engadget.com/2020-01-27-billie-eilish-grammy-2020-bedroom-studio-logic-pro-x.html" target="_blank" rel="noopener">engadget.com</a></li>
+      <li>Suno (platform) — Вікіпедія, <a href="https://en.wikipedia.org/wiki/Suno_(platform)" target="_blank" rel="noopener">en.wikipedia.org/wiki/Suno_(platform)</a></li>
+      <li>Forbes, «Warner Music Settles Lawsuit With Suno», <a href="https://www.forbes.com/sites/conormurray/2025/11/25/warner-music-settles-lawsuit-with-suno-and-will-partner-with-ai-music-generator/" target="_blank" rel="noopener">forbes.com</a></li>
+      <li>Deezer Newsroom, «AI music has surpassed 50% of new music uploads», <a href="https://newsroom-deezer.com/2026/07/ai-music-exceeds-50-percent-daily-uploads-deezer/" target="_blank" rel="noopener">newsroom-deezer.com</a></li>
+      <li>Deezer Newsroom, «AI-generated tracks represent 44% of new uploaded music» (квітень 2026), <a href="https://newsroom-deezer.com/2026/04/ai-generated-tracks-represent-44-of-new-uploaded-music/" target="_blank" rel="noopener">newsroom-deezer.com</a></li>
+      <li>TechCrunch, «Music streamer Deezer says more than 50% of daily uploads are AI-generated», <a href="https://techcrunch.com/2026/07/21/music-streamer-deezer-says-more-than-50-of-daily-uploads-are-ai-generated/" target="_blank" rel="noopener">techcrunch.com</a></li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-logo="1" alt="ОПЛ «Гармонія»">
+      <p style="margin-top:14px"><b>Як розвиток технологій змінив електронну музику?</b></p>
+      <p>Косьянова Аліка · 11-А клас · Керівник: Мушинський А.В.</p>
+    </div>
+    <div>
+      <p><b>ОПЛ «Гармонія»</b>, м. Одеса, вул. Академіка Корольова, 67</p>
+      <p>Тел.: <a href="tel:+380682018852">+380682018852</a></p>
+      <p><a href="mailto:contact@garmonya.od.ua">contact@garmonya.od.ua</a> · <a href="https://harmony-school.com.ua" target="_blank" rel="noopener">harmony-school.com.ua</a></p>
+      <p class="small">Семестровий проєкт, І семестр 2026–2027 н. р.</p>
+    </div>
+  </div>
+</footer>
+
+<script>(function(){var f=document.querySelector("img[data-logo]");if(!f)return;document.querySelectorAll("img[data-logo]").forEach(function(i){i.src=f.src;});})();</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ================= helpers ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const TAU=Math.PI*2;
+const reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const NOTE_UA=['До','До♯','Ре','Ре♯','Мі','Фа','Фа♯','Соль','Соль♯','Ля','Ля♯','Сі'];
+const noteName=m=>NOTE_UA[((m%12)+12)%12]+(Math.floor(m/12)-1);
+const nearestMidi=f=>Math.round(69+12*Math.log2(f/440));
+const hex2=n=>n.toString(16).toUpperCase().padStart(2,'0');
+const fmt=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
+
+function fit(cv){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const w=cv.clientWidth,h=cv.clientHeight;
+  if(!w||!h)return null;
+  const W=Math.round(w*dpr),H=Math.round(h*dpr);
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  const g=cv.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+const visMap=new Map();
+function watch(el,cb,opts){
+  if(!el)return;
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{visMap.set(el,e.isIntersecting);cb&&cb(e.isIntersecting,e)})},opts||{threshold:0.05});
+  io.observe(el);
+  visMap.set(el,false);
+}
+const isVis=el=>visMap.get(el)===true;
+function seg(container,attr,onPick){
+  const btns=$$('button',container);
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    btns.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    onPick(b.dataset[attr],b);
+  }));
+}
+
+/* ================= audio engine ================= */
+const AE={
+  ctx:null,master:null,main:null,an:null,fd:null,muted:false,_nb:null,
+  ensure(){
+    if(!this.ctx){
+      const C=window.AudioContext||window.webkitAudioContext;
+      if(!C)return false;
+      try{this.ctx=new C();}catch(e){return false;}
+      this.main=this.ctx.createGain();
+      this.main.gain.value=0.75;
+      const comp=this.ctx.createDynamicsCompressor();
+      this.an=this.ctx.createAnalyser();
+      this.an.fftSize=1024;this.an.smoothingTimeConstant=.78;
+      this.fd=new Uint8Array(this.an.frequencyBinCount);
+      this.main.connect(comp);comp.connect(this.an);this.an.connect(this.ctx.destination);this.newBus();
+    }
+    if(this.ctx.state==='suspended')this.ctx.resume();
+    return true;
+  },
+  newBus(){const b=this.ctx.createGain();b.gain.value=1;b.connect(this.main);this.master=b;},
+  setMuted(m){
+    this.muted=m;
+    if(this.master)this.master.gain.setTargetAtTime(m?0:0.75,this.ctx.currentTime,.02);
+  },
+  noise(){
+    if(this._nb)return this._nb;
+    const c=this.ctx,b=c.createBuffer(1,c.sampleRate,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    return (this._nb=b);
+  }
+};
+
+function Voice(o){
+  const c=AE.ctx,t=c.currentTime;
+  const out=c.createGain();
+  out.gain.setValueAtTime(0,t);
+  out.gain.linearRampToValueAtTime(o.vol==null?.25:o.vol,t+(o.attack==null?.02:o.attack));
+  const f=c.createBiquadFilter();
+  f.type='lowpass';f.frequency.value=o.cutoff||18000;f.Q.value=o.q==null?.7:o.q;
+  f.connect(out);out.connect(AE.master);
+  const oscs=[];
+  (o.detunes||[0]).forEach(d=>{
+    const s=c.createOscillator();
+    s.type=o.type||'sawtooth';s.frequency.value=o.freq;s.detune.value=d;
+    s.connect(f);s.start(t);oscs.push(s);
+  });
+  let lfo=null;
+  if(o.vibrato){
+    lfo=c.createOscillator();lfo.frequency.value=o.vibRate||5.5;
+    const lg=c.createGain();lg.gain.value=o.vibrato;
+    lfo.connect(lg);oscs.forEach(s=>lg.connect(s.detune));lfo.start(t);
+  }
+  let dead=false;
+  return {
+    oscs,filt:f,out,
+    setFreq(fr,tc){oscs.forEach(s=>s.frequency.setTargetAtTime(fr,c.currentTime,tc==null?.03:tc));},
+    setVol(v,tc){out.gain.setTargetAtTime(v,c.currentTime,tc==null?.03:tc);},
+    setType(ty){oscs.forEach(s=>{s.type=ty;});},
+    stop(rel){
+      if(dead)return;dead=true;
+      rel=rel==null?(o.release==null?.15:o.release):rel;
+      const n=c.currentTime;
+      out.gain.cancelScheduledValues(n);
+      out.gain.setValueAtTime(out.gain.value,n);
+      out.gain.setTargetAtTime(0,n,Math.max(.01,rel/3));
+      oscs.forEach(s=>{try{s.stop(n+rel+.15)}catch(e){}});
+      if(lfo){try{lfo.stop(n+rel+.15)}catch(e){}}
+      setTimeout(()=>{try{out.disconnect()}catch(e){}},(rel+.4)*1000);
+    }
+  };
+}
+function pluck(freq,o){
+  o=o||{};
+  const c=AE.ctx,t=c.currentTime+(o.when||0),dur=o.dur||.5,vol=o.vol==null?.25:o.vol;
+  const s=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();
+  s.type=o.type||'triangle';s.frequency.value=freq;
+  f.type='lowpass';f.frequency.value=o.cutoff||6000;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.006);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(AE.master);
+  s.start(t);s.stop(t+dur+.05);
+}
+function drumHit(name,t){
+  const c=AE.ctx;
+  if(name==='kick'){
+    const s=c.createOscillator(),g=c.createGain();
+    s.frequency.setValueAtTime(160,t);s.frequency.exponentialRampToValueAtTime(42,t+.14);
+    g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+.55);
+    s.connect(g);g.connect(AE.master);s.start(t);s.stop(t+.6);
+  }else if(name==='snare'){
+    const n=c.createBufferSource();n.buffer=AE.noise();
+    const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1900;f.Q.value=.7;
+    const g=c.createGain();g.gain.setValueAtTime(.55,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);
+    n.connect(f);f.connect(g);g.connect(AE.master);n.start(t);n.stop(t+.25);
+    const s=c.createOscillator(),g2=c.createGain();s.type='triangle';
+    s.frequency.setValueAtTime(200,t);s.frequency.exponentialRampToValueAtTime(120,t+.1);
+    g2.gain.setValueAtTime(.4,t);g2.gain.exponentialRampToValueAtTime(.001,t+.12);
+    s.connect(g2);g2.connect(AE.master);s.start(t);s.stop(t+.15);
+  }else if(name==='clap'){
+    const n=c.createBufferSource();n.buffer=AE.noise();
+    const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1250;f.Q.value=1.1;
+    const g=c.createGain();
+    g.gain.setValueAtTime(0,t);
+    [0,.012,.024].forEach(d=>{g.gain.setValueAtTime(.5,t+d);g.gain.exponentialRampToValueAtTime(.05,t+d+.01);});
+    g.gain.setValueAtTime(.5,t+.036);g.gain.exponentialRampToValueAtTime(.001,t+.2);
+    n.connect(f);f.connect(g);g.connect(AE.master);n.start(t);n.stop(t+.25);
+  }else{
+    const n=c.createBufferSource();n.buffer=AE.noise();
+    const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=7200;
+    const g=c.createGain();g.gain.setValueAtTime(.28,t);g.gain.exponentialRampToValueAtTime(.001,t+.06);
+    n.connect(f);f.connect(g);g.connect(AE.master);n.start(t);n.stop(t+.1);
+  }
+}
+
+/* ===== single-source sound manager + global stop ===== */
+const Snd={
+  owner:null,live:false,regs:[],timer:null,
+  reg(name,fn){this.regs.push({name,fn});},
+  cut(){
+    if(!AE.ctx)return;
+    const old=AE.master,t=AE.ctx.currentTime;
+    try{old.gain.cancelScheduledValues(t);old.gain.setTargetAtTime(0,t,.012);}catch(e){}
+    setTimeout(()=>{try{old.disconnect();}catch(e){}},300);
+    AE.newBus();
+  },
+  stopAll(except){
+    this.regs.forEach(r=>{if(r.name!==except){try{r.fn();}catch(e){}}});
+    this.cut();
+    this.owner=null;this.live=false;clearTimeout(this.timer);this.ui();
+  },
+  claim(o,ttl){
+    if(this.owner!==o)this.stopAll(o);
+    this.owner=o;this.live=true;clearTimeout(this.timer);
+    if(ttl)this.timer=setTimeout(()=>{this.live=false;this.ui();},ttl);
+    this.ui();
+  },
+  free(o){if(this.owner===o){this.owner=null;this.live=false;clearTimeout(this.timer);this.ui();}},
+  ui(){document.body.classList.toggle('playing',this.live);}
+};
+$('#soundBtn').addEventListener('click',()=>Snd.stopAll());
+
+/* ================= nav, progress, toc ================= */
+(function(){
+  const bar=$('#progress');
+  function upd(){
+    const h=document.documentElement.scrollHeight-innerHeight;
+    bar.style.width=(h>0?scrollY/h*100:0)+'%';
+  }
+  addEventListener('scroll',upd,{passive:true});upd();
+  const toc=$('#toc');
+  const open=()=>{toc.classList.add('open');document.body.style.overflow='hidden';$('#tocClose').focus();};
+  const close=()=>{toc.classList.remove('open');document.body.style.overflow='';};
+  $('#tocBtn').addEventListener('click',open);
+  $('#tocClose').addEventListener('click',close);
+  $$('#toc a').forEach(a=>a.addEventListener('click',close));
+  addEventListener('keydown',e=>{if(e.key==='Escape'){if(toc.classList.contains('open'))close();else Snd.stopAll();}});
+})();
+
+/* ================= warped headings ================= */
+const warps=[];
+(function(){
+  if(reduceMotion)return;
+  $$('.warp').forEach(el=>{
+    const text=el.textContent.trim();
+    el.setAttribute('aria-label',text);
+    el.textContent='';
+    const letters=[];
+    text.split(' ').forEach((word,wi,arr)=>{
+      const w=document.createElement('span');w.setAttribute('aria-hidden','true');w.style.whiteSpace='nowrap';
+      Array.from(word).forEach(ch=>{const s=document.createElement('span');s.textContent=ch;w.appendChild(s);letters.push(s);});
+      el.appendChild(w);
+      if(wi<arr.length-1)el.appendChild(document.createTextNode(' '));
+    });
+    const item={el,letters,vis:false,big:el.id==='heroTitle'};
+    warps.push(item);
+    new IntersectionObserver(es=>{item.vis=es[0].isIntersecting;}).observe(el);
+  });
+})();
+
+/* ================= hero 3D ================= */
+const Hero={visible:true,spin:0,render:null};
+function makeVinylTexture(){
+  const s=1024,c=document.createElement('canvas');c.width=c.height=s;
+  const g=c.getContext('2d');
+  g.fillStyle='#060606';g.fillRect(0,0,s,s);
+  for(let r=175;r<505;r+=2.4){
+    g.beginPath();g.arc(512,512,r,0,TAU);
+    g.strokeStyle='rgba(255,255,255,'+(0.025+0.06*Math.random())+')';g.lineWidth=1;g.stroke();
+  }
+  [270,350,430].forEach(r=>{g.beginPath();g.arc(512,512,r,0,TAU);g.strokeStyle='rgba(0,0,0,.95)';g.lineWidth=6;g.stroke();});
+  if(g.createConicGradient){
+    const cg=g.createConicGradient(0,512,512);
+    cg.addColorStop(0,'rgba(255,255,255,0)');cg.addColorStop(.1,'rgba(255,255,255,.2)');cg.addColorStop(.22,'rgba(255,255,255,0)');
+    cg.addColorStop(.5,'rgba(255,255,255,0)');cg.addColorStop(.6,'rgba(255,255,255,.2)');cg.addColorStop(.72,'rgba(255,255,255,0)');cg.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=cg;g.beginPath();g.arc(512,512,505,0,TAU);g.arc(512,512,158,0,TAU,true);g.fill('evenodd');
+  }
+  g.fillStyle='#86E8B0';g.beginPath();g.arc(512,512,155,0,TAU);g.fill();
+  g.fillStyle='#000';g.textAlign='center';
+  g.font='800 40px Tektur, Arial, sans-serif';g.fillText('ЕЛЕКТРО',512,500);
+  g.font='600 26px Onest, Arial, sans-serif';g.fillText('11-А · 2026',512,544);
+  g.fillStyle='#060606';g.beginPath();g.arc(512,512,14,0,TAU);g.fill();
+  return c;
+}
+function initHero(){
+  const cv=$('#heroCanvas');
+  if(!window.THREE){cv.style.display='none';return;}
+  let r;
+  try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});}catch(e){cv.style.display='none';return;}
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(40,1,.1,100);
+  cam.position.set(0,6.4,9.4);cam.lookAt(0,0,0);
+  const grp=new THREE.Group();scene.add(grp);
+  const tex=new THREE.CanvasTexture(makeVinylTexture());
+  tex.anisotropy=8;
+  const top=new THREE.MeshStandardMaterial({map:tex,roughness:.38,metalness:.35});
+  const side=new THREE.MeshStandardMaterial({color:0x050505,roughness:.6});
+  const disc=new THREE.Mesh(new THREE.CylinderGeometry(3,3,.1,96),[side,top,side]);
+  grp.add(disc);
+  scene.add(new THREE.AmbientLight(0xffffff,.7));
+  const dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(3,7,4);scene.add(dl);
+  const pl=new THREE.PointLight(0x86E8B0,1.4,30);pl.position.set(-5,3,-3);scene.add(pl);
+
+  /* tonearm */
+  const pivot=new THREE.Group();pivot.position.set(3.7,.25,-2.7);grp.add(pivot);
+  const metal=new THREE.MeshStandardMaterial({color:0xcfcfcf,metalness:.8,roughness:.3});
+  const mint=new THREE.MeshStandardMaterial({color:0x86E8B0,metalness:.2,roughness:.4});
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.45,.35,24),metal);base.position.y=-.05;pivot.add(base);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,4.2),metal);arm.position.set(0,.12,2.1);pivot.add(arm);
+  const head=new THREE.Mesh(new THREE.BoxGeometry(.34,.12,.55),mint);head.position.set(0,.08,4.3);pivot.add(head);
+  pivot.rotation.y=Math.atan2(-2.4,3.4);
+
+  /* equalizer ring */
+  const N=72,bars=[];
+  const mBar=new THREE.MeshBasicMaterial({color:0x86E8B0});
+  const mRed=new THREE.MeshBasicMaterial({color:0xff3b30});
+  const bg=new THREE.BoxGeometry(.13,1,.13);
+  for(let i=0;i<N;i++){
+    const m=new THREE.Mesh(bg,(i%9===0)?mRed:mBar);
+    const a=i/N*TAU;
+    m.position.set(Math.cos(a)*3.55,.05,Math.sin(a)*3.55);
+    m.rotation.y=-a;
+    grp.add(m);bars.push(m);
+  }
+  /* particles */
+  const pc=420,pp=new Float32Array(pc*3);
+  for(let i=0;i<pc;i++){
+    const rad=5+Math.random()*7,a=Math.random()*TAU,y=(Math.random()-.5)*8;
+    pp[i*3]=Math.cos(a)*rad;pp[i*3+1]=y;pp[i*3+2]=Math.sin(a)*rad;
+  }
+  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0x86E8B0,size:.05,transparent:true,opacity:.7}));
+  scene.add(pts);
+
+  let tx=0,ty=0,drag=false,lx=0,vel=0,aspect=1;
+  cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;try{cv.setPointerCapture(e.pointerId)}catch(_){} });
+  cv.addEventListener('pointermove',e=>{
+    const rc=cv.getBoundingClientRect();
+    tx=((e.clientX-rc.left)/rc.width-.5);ty=((e.clientY-rc.top)/rc.height-.5);
+    if(drag){vel+=(e.clientX-lx)*.012;lx=e.clientX;}
+  });
+  const up=()=>{drag=false;};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+
+  function resize(){
+    const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
+    r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(w,h,false);
+    aspect=w/h;cam.aspect=aspect;cam.updateProjectionMatrix();
+    if(aspect>1.15){grp.position.set(Math.min(2.7,aspect*1.3),0,0);grp.scale.setScalar(.8);}
+    else{grp.position.set(0,2.7,0);grp.scale.setScalar(.5);}
+  }
+  new ResizeObserver(resize).observe(cv);resize();
+
+  let lastScroll=scrollY,sv=0;
+  Hero.render=function(t,dt){
+    const ds=scrollY-lastScroll;lastScroll=scrollY;sv=lerp(sv,ds,.2);
+    vel=lerp(vel,0,.04);
+    const base=reduceMotion?0:.55;
+    disc.rotation.y-=(base+vel+sv*.02)*dt;
+    grp.rotation.x=lerp(grp.rotation.x,ty*.25,.05);
+    grp.rotation.z=lerp(grp.rotation.z,-tx*.18,.05);
+    pivot.rotation.y=Math.atan2(-2.4,3.4)+Math.sin(t*.0012)*.012;
+    pts.rotation.y=t*.00005;
+    let fd=null;
+    if(AE.an){AE.an.getByteFrequencyData(AE.fd);fd=AE.fd;}
+    for(let i=0;i<N;i++){
+      const idle=.15+.4*(.5+.5*Math.sin(i*.35+t*.0017))*(.6+.4*Math.sin(i*.11-t*.0006));
+      let h=idle;
+      if(fd){
+        const k=i<N/2?i:N-1-i;
+        const v=fd[1+Math.floor(k/(N/2)*110)]/255;
+        h=Math.max(idle,.1+v*2.6);
+      }
+      bars[i].scale.y=h;bars[i].position.y=.05+h/2;
+    }
+    r.render(scene,cam);
+  };
+  watch($('#top'),v=>{Hero.visible=v;});
+}
+
+/* hero demo jingle */
+(function(){
+  const btn=$('#heroPlay');let timer=null,step=0;
+  const stopJ=()=>{if(timer){clearInterval(timer);timer=null;}btn.textContent='▶ Увімкнути музику';};
+  Snd.reg('hero',stopJ);
+  const arp=[57,60,64,69,64,60,64,60, 53,57,60,65,60,57,60,57, 48,52,55,60,55,52,55,52, 55,59,62,67,62,59,62,59];
+  btn.addEventListener('click',()=>{
+    if(timer){stopJ();Snd.free('hero');return;}
+    if(!AE.ensure())return;
+    Snd.claim('hero');
+    btn.textContent='■ Зупинити музику';step=0;
+    const dur=60/112/2;
+    timer=setInterval(()=>{
+      const i=step%arp.length;
+      pluck(mtof(arp[i]),{type:'sawtooth',dur:.28,vol:.11,cutoff:2400+Math.sin(step*.2)*1400});
+      if(i%8===0){pluck(mtof(arp[i]-24),{type:'sine',dur:1.1,vol:.22});drumHit('kick',AE.ctx.currentTime);}
+      if(i%4===2)drumHit('hat',AE.ctx.currentTime);
+      if(i%8===4)drumHit('clap',AE.ctx.currentTime);
+      step++;
+    },dur*1000);
+  });
+})();
+
+/* ================= chapter 1: lab ================= */
+const Lab={wave:'sine',f:440,vol:.45,voice:null,playing:false};
+function waveVal(type,p){
+  const s=Math.sin(p);
+  if(type==='square')return Math.tanh(s*6)*.95;
+  if(type==='sawtooth'){const u=((p/TAU)%1+1)%1;return 2*u-1;}
+  if(type==='triangle')return 2/Math.PI*Math.asin(s);
+  return s;
+}
+const waveInfo={
+  sine:'Синус — найчистіший звук, без додаткових обертонів.',
+  square:'Квадрат — порожнистий, «ігровий» звук: він багатий на непарні обертони.',
+  sawtooth:'Пила — яскравий, «дзижчливий» тембр: основа більшості синтезаторних басів і соло.',
+  triangle:'Трикутник — м’який звук, схожий на синус, але з легким обертоном.'
+};
+let lab3=null;
+function initLab(){
+  const fr=$('#labFreq'),vo=$('#labVol');
+  const upd=()=>{
+    Lab.f=55*Math.pow(2,fr.value/1000*5);
+    Lab.vol=vo.value/100;
+    $('#labFreqO').textContent=Math.round(Lab.f)+' Гц';
+    $('#labVolO').textContent=vo.value+' %';
+    $('#labRead').textContent=Math.round(Lab.f)+' Гц · '+noteName(nearestMidi(Lab.f));
+    const pos=(Math.log(Lab.f)-Math.log(20))/(Math.log(20000)-Math.log(20));
+    $('#hearMark').style.left=(pos*100)+'%';
+    if(Lab.voice){Lab.voice.setFreq(Lab.f);Lab.voice.setVol(Lab.vol*.5);}
+  };
+  fr.addEventListener('input',upd);vo.addEventListener('input',upd);upd();
+  seg($('#waveSeg'),'w',w=>{
+    Lab.wave=w;$('#labWaveInfo').textContent=waveInfo[w];
+    if(Lab.voice)Lab.voice.setType(w);
+  });
+  const labStop=()=>{Lab.voice&&Lab.voice.stop(.1);Lab.voice=null;Lab.playing=false;$('#labPlay').textContent='▶ Звучати';};
+  Snd.reg('lab',labStop);
+  $('#labPlay').addEventListener('click',e=>{
+    if(Lab.playing){labStop();Snd.free('lab');return;}
+    if(!AE.ensure())return;
+    Snd.claim('lab');
+    Lab.voice=Voice({type:Lab.wave,freq:Lab.f,vol:Lab.vol*.5,attack:.03,release:.12});
+    Lab.playing=true;e.currentTarget.textContent='■ Зупинити';
+  });
+  /* 3D */
+  if(!window.THREE)return;
+  const cv=$('#labCanvas');let r;
+  try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});}catch(e){return;}
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(45,1,.1,100);cam.position.set(0,4.6,8.6);cam.lookAt(0,0,0);
+  const geo=new THREE.PlaneGeometry(12,7,96,56);geo.rotateX(-Math.PI/2);
+  const pos=geo.attributes.position;const bx=new Float32Array(pos.count),bz=new Float32Array(pos.count);
+  for(let i=0;i<pos.count;i++){bx[i]=pos.getX(i);bz[i]=pos.getZ(i);}
+  const mat=new THREE.MeshBasicMaterial({color:0x86E8B0,wireframe:true,transparent:true,opacity:.55});
+  const mesh=new THREE.Mesh(geo,mat);const grp=new THREE.Group();grp.add(mesh);scene.add(grp);
+  let yaw=0,pitch=0,tY=0,tP=0,drag=false,lx=0,ly=0;
+  cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;try{cv.setPointerCapture(e.pointerId)}catch(_){} });
+  cv.addEventListener('pointermove',e=>{if(!drag)return;tY+=(e.clientX-lx)*.008;tP=clamp(tP+(e.clientY-ly)*.005,-.5,.7);lx=e.clientX;ly=e.clientY;});
+  const up=()=>{drag=false;};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  function resize(){const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;r.setPixelRatio(Math.min(devicePixelRatio||1,2));r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+  new ResizeObserver(resize).observe(cv);resize();
+  lab3=function(t){
+    const k=.55+(Math.log2(Lab.f/55)/5)*3.2;
+    const amp=.2+Lab.vol*2.5;
+    const spd=Lab.playing?.0045:.0013;
+    for(let i=0;i<pos.count;i++){
+      const x=bx[i],z=bz[i];
+      pos.setY(i,waveVal(Lab.wave,k*x-spd*t)*amp*Math.exp(-(z*z)/9));
+    }
+    pos.needsUpdate=true;
+    mat.opacity=Lab.playing?.9:.5;
+    yaw=lerp(yaw,tY,.08);pitch=lerp(pitch,tP,.08);
+    grp.rotation.y=yaw+Math.sin(t*.0003)*.12;grp.rotation.x=pitch;
+    r.render(scene,cam);
+  };
+  watch(cv,()=>{});
+}
+function drawScope(t){
+  const cv=$('#labScope'),f=fit(cv);if(!f)return;
+  const {g,w,h}=f;g.clearRect(0,0,w,h);
+  g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1;
+  g.beginPath();g.moveTo(0,h/2);g.lineTo(w,h/2);g.stroke();
+  const cycles=2+Math.log2(Lab.f/55)*1.2;
+  g.strokeStyle='#86E8B0';g.lineWidth=2.5;g.beginPath();
+  for(let x=0;x<=w;x+=2){
+    const p=x/w*TAU*cycles-t*.004*(Lab.playing?1:.3);
+    const y=h/2-waveVal(Lab.wave,p)*(h*.42)*(.25+Lab.vol*1.4>1?1:.25+Lab.vol*1.4);
+    x?g.lineTo(x,y):g.moveTo(x,y);
+  }
+  g.stroke();
+}
+
+/* ================= chapter 2: chain ================= */
+(function(){
+  const info=[
+    'Генератор (осцилятор) створює коливання певної форми — «сировину» звуку: синус, пилу чи квадрат. У перших інструментах його роль виконували обертові колеса й лампи.',
+    'Фільтр забирає з сигналу частину частот і так змінює тембр. Саме ручка фільтра робить звук «темним» або «яскравим». Ти зможеш крутити її в розділі про Moog.',
+    'Підсилювач керує гучністю й формою звуку в часі: різкий удар чи плавне наростання. У синтезаторах цим займається «огинаюча».',
+    'Динамік перетворює електричний сигнал назад на коливання повітря. Без нього електронна музика залишилась би лише струмом у дроті.'
+  ];
+  const box=$('#chain'),txt=$('#chainInfo');
+  const btns=$$('button',box);
+  function sound(i){
+    if(!AE.ensure())return;
+    Snd.claim('chain',2000);
+    const c=AE.ctx,t=c.currentTime;
+    if(i===0){const v=Voice({type:'sawtooth',freq:196,vol:.18,attack:.02});setTimeout(()=>v.stop(.1),600);}
+    else if(i===1){const v=Voice({type:'sawtooth',freq:131,vol:.2,cutoff:3200,q:8,attack:.02});
+      v.filt.frequency.setValueAtTime(3200,t);v.filt.frequency.exponentialRampToValueAtTime(250,t+.9);setTimeout(()=>v.stop(.1),1000);}
+    else if(i===2){const v=Voice({type:'triangle',freq:262,vol:.0,attack:.01});
+      v.out.gain.cancelScheduledValues(t);v.out.gain.setValueAtTime(0,t);
+      v.out.gain.linearRampToValueAtTime(.3,t+.5);v.out.gain.linearRampToValueAtTime(.02,t+.9);v.out.gain.linearRampToValueAtTime(.3,t+1.3);
+      setTimeout(()=>v.stop(.2),1500);}
+    else{pluck(330,{type:'sine',dur:.9,vol:.3});pluck(494,{type:'sine',dur:.9,vol:.2,when:.12});}
+  }
+  function pick(i){
+    btns.forEach((b,k)=>b.setAttribute('aria-pressed',String(k===i)));
+    txt.textContent=info[i];sound(i);
+  }
+  btns.forEach((b,i)=>b.addEventListener('click',()=>pick(i)));
+  txt.textContent=info[0];
+})();
+
+/* ================= chapter 3: eras ================= */
+const ERAS=[
+  {y:'1897–1906',s:'1897',n:'Телармоніум',what:'Музика вперше народжується з електрики, а не зі струн чи труб. Її передають дротами.',who:'Винахідник-інженер з величезною машиною.',acc:4,ch:'#s4'},
+  {y:'1920',s:'1920',n:'Терменвокс',what:'Звуком можна керувати рухом рук у повітрі, без дотику.',who:'Піонери-виконавці, що опанували незвичну техніку.',acc:9,ch:'#s5'},
+  {y:'1929',s:'1929',n:'Траутоніум',what:'Висоту й тембр можна «ліпити» пальцем по стрічці.',who:'Інженери й композитори в експериментальних студіях.',acc:14,ch:'#s6'},
+  {y:'1963–1968',s:'1963',n:'Мелотрон і Moog',what:'Синтезатор виходить на сцену й в альбоми. Тембри створюють самі музиканти.',who:'Рок-гурти та перші електронні композитори.',acc:26,ch:'#s8'},
+  {y:'1980',s:'1980',n:'Драм-машина TR-808',what:'Ритм більше не потребує барабанщика й великої студії.',who:'Продюсери, що працюють удвох-утрьох.',acc:40,ch:'#s9'},
+  {y:'1983',s:'1983',n:'MIDI та DX7',what:'Різні інструменти заговорили однією мовою й почали працювати разом.',who:'Музиканти зі студією на кількох клавішах.',acc:52,ch:'#s9'},
+  {y:'1997–2020',s:'1997',n:'Комп’ютер і домашня студія',what:'Студія вміщається в ноутбук, а запис — у спальню.',who:'Підлітки з ноутбуком, як Біллі Айліш.',acc:82,ch:'#s11'},
+  {y:'2023–2026',s:'2023',n:'Штучний інтелект',what:'Пісню можна отримати за текстовим запитом за кілька секунд.',who:'Практично будь-хто, хто вміє сформулювати ідею.',acc:98,ch:'#s13'}
+];
+const EW=[
+  (p)=>(Math.sin(p)+.5*Math.sin(2*p)+.33*Math.sin(3*p)+.25*Math.sin(4*p))/1.5,
+  (p,t)=>Math.sin(p+1.8*Math.sin(t*.003)+.8*Math.sin(p*.25)),
+  (p)=>{const u=((p/TAU)%1+1)%1;return 2*u-1;},
+  (p,t)=>{const c=2+6*(.5+.5*Math.sin(t*.002));let s=0;for(let k=1;k<=10;k++)s+=Math.sin(k*p)/k*Math.exp(-Math.pow(k/c,2));return s*.8;},
+  (p)=>{const u=((p/TAU)%1+1)%1;return Math.exp(-u*4.2)*Math.sin(TAU*u*(1.5+7*Math.exp(-u*7))*2.2);},
+  (p,t)=>Math.sin(p+2.6*Math.sin(2*p+t*.002)),
+  (p)=>{const q=Math.round(p/.3)*.3;return Math.round((Math.sin(q)+.45*Math.sin(3*q))*3.2)/3.2/1.3;},
+  (p,t)=>(Math.sin(p)+.55*Math.sin(2.3*p+t*.0021)+.4*Math.sin(5.1*p-t*.0017)+.3*Math.sin(9.7*p+t*.0023)+.22*Math.sin(Math.sin(p*43.7+t*.005)*9))/1.9
+];
+const Era={idx:0,disp:0,auto:null};
+function mixColor(f){
+  const k=clamp((f-.7)/.3,0,1);
+  const a=[134,232,176],b=[255,59,48];
+  return 'rgb('+Math.round(lerp(a[0],b[0],k))+','+Math.round(lerp(a[1],b[1],k))+','+Math.round(lerp(a[2],b[2],k))+')';
+}
+function setEra(i){
+  Era.idx=i;const e=ERAS[i];
+  $('#eraRange').value=i;
+  $('#eraYr').textContent=e.y;$('#eraNm').textContent=e.n;
+  $('#eraWhat').textContent=e.what;$('#eraWho').textContent=e.who;
+  $('#eraMeter').style.width=e.acc+'%';
+  $('#eraGo').setAttribute('href',e.ch);
+  $$('#eraDots button').forEach((b,k)=>b.setAttribute('aria-current',String(k===i)));
+}
+function previewEra(i){
+  if(!AE.ensure())return;
+  Snd.claim('era',2600);
+  const c=AE.ctx,t=c.currentTime+.03;
+  const mk=(type,fr,vol,a,d,cut)=>{
+    const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();
+    o.type=type;o.frequency.setValueAtTime(fr,t);f.type='lowpass';f.frequency.value=cut||12000;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+a);g.gain.setTargetAtTime(0,t+a+d*.55,d*.22);
+    o.connect(f);f.connect(g);g.connect(AE.master);o.start(t);o.stop(t+a+d+.4);return {o,g,f};
+  };
+  if(i===0){
+    const o=c.createOscillator(),g=c.createGain();
+    const re=new Float32Array(5),im=new Float32Array([0,1,.5,.33,.25]);
+    o.setPeriodicWave(c.createPeriodicWave(re,im));o.frequency.value=196;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.24,t+.2);g.gain.setTargetAtTime(0,t+1.2,.35);
+    o.connect(g);g.connect(AE.master);o.start(t);o.stop(t+2.4);
+  }else if(i===1){
+    const m=mk('sine',440,.28,.1,1.8);
+    m.o.frequency.linearRampToValueAtTime(587,t+1.2);
+    const l=c.createOscillator(),lg=c.createGain();l.frequency.value=6;lg.gain.value=11;l.connect(lg);lg.connect(m.o.frequency);l.start(t);l.stop(t+2.4);
+  }else if(i===2){
+    const m=mk('sawtooth',110,.22,.05,1.6,1400);m.o.frequency.exponentialRampToValueAtTime(165,t+1);
+    const s=mk('square',55,.14,.05,1.6,500);s.o.frequency.exponentialRampToValueAtTime(82,t+1);
+  }else if(i===3){
+    const m=mk('sawtooth',110,.22,.04,1.6,3000);
+    m.f.Q.value=12;m.f.frequency.setValueAtTime(200,t);m.f.frequency.exponentialRampToValueAtTime(2800,t+.7);m.f.frequency.exponentialRampToValueAtTime(260,t+1.5);
+    const m2=mk('sawtooth',110.9,.18,.04,1.6,3000);m2.f.frequency.setValueAtTime(200,t);m2.f.frequency.exponentialRampToValueAtTime(2800,t+.7);m2.f.frequency.exponentialRampToValueAtTime(260,t+1.5);
+  }else if(i===4){
+    [[0,'kick'],[.3,'hat'],[.6,'snare'],[.9,'kick'],[1.2,'hat'],[1.35,'kick'],[1.5,'clap']].forEach(a=>drumHit(a[1],t+a[0]));
+  }else if(i===5){
+    const car=c.createOscillator(),mod=c.createOscillator(),mg=c.createGain(),g=c.createGain();
+    car.frequency.value=220;mod.frequency.value=440;
+    mg.gain.setValueAtTime(380,t);mg.gain.setTargetAtTime(10,t+.05,.5);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.3,t+.01);g.gain.setTargetAtTime(0,t+.15,.55);
+    mod.connect(mg);mg.connect(car.frequency);car.connect(g);g.connect(AE.master);
+    car.start(t);mod.start(t);car.stop(t+2.5);mod.stop(t+2.5);
+  }else if(i===6){
+    [57,60,64,69,72,69,64,60,57,60,64,69].forEach((n,k)=>pluck(mtof(n),{type:'square',dur:.16,vol:.1,when:.03+k*.125,cutoff:3000}));
+  }else{
+    [57,60,64,67].forEach(n=>{[-9,0,9].forEach(d=>{const x=mk('sawtooth',mtof(n),.07,.5,1.6,1800);x.o.detune.value=d;});});
+    for(let k=0;k<9;k++)pluck(mtof(81+[0,3,7,10,12][Math.floor(Math.random()*5)]),{type:'sine',dur:.5,vol:.07,when:.2+k*.2});
+  }
+}
+function initEras(){
+  const dots=$('#eraDots');
+  ERAS.forEach((e,i)=>{
+    const b=document.createElement('button');b.textContent=e.s;b.setAttribute('aria-label',e.n+', '+e.y);
+    b.addEventListener('click',()=>{stopAuto();setEra(i);});dots.appendChild(b);
+  });
+  $('#eraRange').addEventListener('input',e=>{stopAuto();setEra(+e.target.value);});
+  $('#eraHear').addEventListener('click',()=>previewEra(Era.idx));
+  function stopAuto(){if(Era.auto){clearInterval(Era.auto);Era.auto=null;$('#eraAuto').textContent='Автоподорож';}}
+  $('#eraAuto').addEventListener('click',()=>{
+    if(Era.auto){stopAuto();return;}
+    $('#eraAuto').textContent='■ Стоп';
+    Era.auto=setInterval(()=>{setEra((Era.idx+1)%ERAS.length);},2300);
+  });
+  setEra(0);
+  watch($('#eraCanvas'),()=>{});
+}
+function drawEra(t){
+  const cv=$('#eraCanvas'),f=fit(cv);if(!f)return;
+  const {g,w,h}=f;g.clearRect(0,0,w,h);
+  Era.disp+=(Era.idx-Era.disp)*.07;
+  const i0=Math.floor(Era.disp+1e-6),i1=Math.min(7,i0+1),fr=Era.disp-i0;
+  g.strokeStyle='rgba(255,255,255,.08)';g.lineWidth=1;
+  for(let i=1;i<8;i++){g.beginPath();g.moveTo(w/8*i,0);g.lineTo(w/8*i,h);g.stroke();}
+  for(let i=1;i<4;i++){g.beginPath();g.moveTo(0,h/4*i);g.lineTo(w,h/4*i);g.stroke();}
+  const col=mixColor(Era.disp/7);
+  for(let L=2;L>=0;L--){
+    g.beginPath();
+    for(let x=0;x<=w;x+=3){
+      const p=x/w*TAU*3-t*.0035+L*.3;
+      const v=lerp(EW[i0](p,t),EW[i1](p,t),fr);
+      const y=h/2-v*h*.34*(1-L*.12);
+      x?g.lineTo(x,y):g.moveTo(x,y);
+    }
+    g.strokeStyle=col;g.globalAlpha=L===0?1:(L===1?.35:.16);g.lineWidth=L===0?3:2;g.stroke();
+  }
+  g.globalAlpha=1;
+  g.fillStyle='rgba(255,255,255,.55)';g.font='600 12px Onest, sans-serif';
+  g.fillText(ERAS[Math.round(Era.disp)].y+' · '+ERAS[Math.round(Era.disp)].n,12,20);
+}
+
+/* ================= chapter 4: balance ================= */
+(function(){
+  const r=$('#elRange'),o=$('#elO'),beam=$('#beam'),pl=$('#panL'),pr=$('#panR'),em=$('#elephants'),msg=$('#balMsg');
+  function upd(){
+    const n=+r.value;o.textContent=n;
+    const diff=200-n*5;
+    const a=-clamp(diff/80,-1,1)*14;
+    beam.style.transform='rotate('+a+'deg)';
+    pl.style.transformOrigin='50px 140px';pl.style.transform='rotate('+(-a)+'deg)';
+    pr.style.transformOrigin='370px 140px';pr.style.transform='rotate('+(-a)+'deg)';
+    em.textContent=n===0?'':(n<=9?'🐘'.repeat(n):'🐘×'+n);
+    if(n===40)msg.textContent='Рівновага! 40 слонів — це приблизно 200 тонн.';
+    else if(n<40)msg.textContent='Ще бракує приблизно '+(200-n*5)+' т. Додай слонів.';
+    else msg.textContent='Забагато: слони переважили Телармоніум на '+(n*5-200)+' т.';
+  }
+  r.addEventListener('input',upd);upd();
+})();
+
+/* ================= chapter 5: theremin ================= */
+const Th={on:false,voice:null,x:.5,y:.5,active:false,glow:0};
+function initTheremin(){
+  const cv=$('#thereminPad'),btn=$('#thBtn'),rd=$('#thRead');
+  const thOff=()=>{Th.on=false;Th.voice&&Th.voice.stop(.1);Th.voice=null;btn.textContent='▶ Увімкнути терменвокс';rd.textContent='— Гц';};
+  Snd.reg('theremin',thOff);
+  btn.addEventListener('click',()=>{
+    if(Th.on){thOff();Snd.free('theremin');return;}
+    if(!AE.ensure())return;
+    Snd.claim('theremin');
+    Th.on=true;btn.textContent='■ Вимкнути терменвокс';
+    Th.voice=Voice({type:'sine',freq:260,vol:0,attack:.01,vibrato:9,vibRate:5.2,release:.1});
+  });
+  function move(e){
+    const rc=cv.getBoundingClientRect();
+    Th.x=clamp((e.clientX-rc.left)/rc.width,0,1);Th.y=clamp((e.clientY-rc.top)/rc.height,0,1);
+    Th.active=true;
+    if(!Th.on||!Th.voice)return;
+    const f=130.81*Math.pow(2,Th.x*3.6);
+    const v=Th.y>.94?0:Math.pow(1-Th.y,1.3)*.34;
+    Th.voice.setFreq(f,.02);Th.voice.setVol(v,.04);
+    rd.textContent=Math.round(f)+' Гц · '+noteName(nearestMidi(f));
+  }
+  cv.addEventListener('pointermove',move);
+  cv.addEventListener('pointerdown',move);
+  const leave=()=>{Th.active=false;if(Th.voice)Th.voice.setVol(0,.05);};
+  cv.addEventListener('pointerleave',leave);cv.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')leave();});
+  cv.addEventListener('pointercancel',leave);
+  watch(cv,()=>{});
+}
+function drawTheremin(t){
+  const cv=$('#thereminPad'),f=fit(cv);if(!f)return;
+  const {g,w,h}=f;g.clearRect(0,0,w,h);
+  const ax=w-34;
+  g.strokeStyle='#fff';g.lineWidth=4;g.lineCap='round';
+  g.beginPath();g.moveTo(ax,h-8);g.lineTo(ax,22);g.stroke();
+  g.fillStyle='#86E8B0';g.beginPath();g.arc(ax,18,7,0,TAU);g.fill();
+  const lx=64,ly=h-34;
+  g.lineWidth=3;g.strokeStyle='#fff';g.beginPath();g.ellipse(lx,ly,44,18,0,0,TAU);g.stroke();
+  g.fillStyle='rgba(255,255,255,.6)';g.font='600 12px Onest, sans-serif';
+  g.textAlign='right';g.fillText('антена висоти',ax-12,h-12);
+  g.textAlign='left';g.fillText('петля гучності',lx-44,ly-28);
+  const px=Th.x*w,py=Th.y*h;
+  Th.glow=lerp(Th.glow,Th.active&&Th.on?1:0,.1);
+  if(Th.glow>.02){
+    const gr=g.createRadialGradient(px,py,0,px,py,90);
+    gr.addColorStop(0,'rgba(134,232,176,'+(.55*Th.glow)+')');gr.addColorStop(1,'rgba(134,232,176,0)');
+    g.fillStyle=gr;g.beginPath();g.arc(px,py,90,0,TAU);g.fill();
+    const sp=46-Th.x*30;
+    for(let k=0;k<5;k++){
+      const rr=((t*.05+k*sp)%(sp*5));
+      g.strokeStyle='rgba(134,232,176,'+(.5*Th.glow*(1-rr/(sp*5)))+')';g.lineWidth=2;
+      g.beginPath();g.arc(px,py,rr,0,TAU);g.stroke();
+    }
+    g.strokeStyle='rgba(255,255,255,'+(.25+.5*Th.x)*Th.glow+')';g.lineWidth=1+Th.x*2.5;
+    g.beginPath();g.moveTo(px,py);g.lineTo(ax,clamp(py,30,h-20));g.stroke();
+    g.strokeStyle='rgba(255,59,48,'+(.2+.5*Th.y)*Th.glow+')';g.lineWidth=1+Th.y*2.5;
+    g.beginPath();g.moveTo(px,py);g.lineTo(lx,ly);g.stroke();
+    g.fillStyle='#fff';g.beginPath();g.arc(px,py,6,0,TAU);g.fill();
+  }
+  if(!Th.on){
+    g.fillStyle='rgba(0,0,0,.55)';g.fillRect(0,0,w,h);
+    g.fillStyle='#86E8B0';g.font='700 16px Onest, sans-serif';g.textAlign='center';
+    g.fillText('Натисни «Увімкнути терменвокс»',w/2,h/2);
+  }
+  g.textAlign='left';
+}
+
+/* ================= chapter 6: trautonium ================= */
+(function(){
+  const rb=$('#ribbon'),dot=$('#ribDot'),rd=$('#trRead'),cut=$('#trCut'),subBtn=$('#subBtn');
+  let voices=null,sub=false;
+  const cutF=()=>300*Math.pow(2,cut.value/100*5);
+  const upd=()=>{$('#trCutO').textContent=Math.round(cutF())+' Гц';if(voices)voices.forEach(v=>v.filt.frequency.setTargetAtTime(cutF(),AE.ctx.currentTime,.03));};
+  cut.addEventListener('input',upd);upd();
+  subBtn.addEventListener('click',()=>{sub=!sub;subBtn.setAttribute('aria-pressed',String(sub));subBtn.textContent='Підтони: '+(sub?'увімк.':'вимк.');});
+  function pos(e){const rc=rb.getBoundingClientRect();return clamp((e.clientX-rc.left)/rc.width,0,1);}
+  function freq(x){return 65.41*Math.pow(2,x*3);}
+  function start(e){
+    if(!AE.ensure())return;
+    Snd.claim('trautonium',3000);
+    const x=pos(e),f=freq(x);
+    voices=[Voice({type:'sawtooth',freq:f,vol:.2,cutoff:cutF(),q:5,attack:.02,release:.12})];
+    if(sub){voices.push(Voice({type:'square',freq:f/2,vol:.1,cutoff:cutF(),q:2,attack:.03,release:.12}));voices.push(Voice({type:'square',freq:f/3,vol:.07,cutoff:cutF(),q:2,attack:.03,release:.12}));}
+    rb.classList.add('on');move(e);
+    try{rb.setPointerCapture(e.pointerId)}catch(_){}
+  }
+  function move(e){
+    if(!voices)return;
+    const x=pos(e),f=freq(x);
+    voices[0].setFreq(f,.015);
+    if(voices[1])voices[1].setFreq(f/2,.015);
+    if(voices[2])voices[2].setFreq(f/3,.015);
+    dot.style.left=(x*100)+'%';
+    rd.textContent=Math.round(f)+' Гц · '+noteName(nearestMidi(f));
+  }
+  function end(){if(!voices)return;voices.forEach(v=>v.stop(.12));voices=null;rb.classList.remove('on');}
+  Snd.reg('trautonium',end);
+  rb.addEventListener('pointerdown',start);
+  rb.addEventListener('pointermove',move);
+  rb.addEventListener('pointerup',end);rb.addEventListener('pointercancel',end);rb.addEventListener('lostpointercapture',end);
+})();
+
+/* ================= keyboard builder ================= */
+function buildKB(el,o){
+  const isB=m=>[1,3,6,8,10].indexOf(((m%12)+12)%12)>=0;
+  const keys=[];for(let m=o.start;m<o.start+o.count;m++)keys.push(m);
+  const nW=keys.filter(m=>!isB(m)).length,wW=100/nW;
+  const els=new Map(),down=new Set();let wi=0;
+  keys.forEach(m=>{
+    const k=document.createElement('div');
+    if(isB(m)){k.className='b';k.style.left=(wi*wW-wW*.3)+'%';k.style.width=(wW*.6)+'%';}
+    else{
+      k.className='w';wi++;
+      if(m%12===0){const s=document.createElement('span');s.className='tag';s.textContent=noteName(m);k.appendChild(s);}
+    }
+    k.setAttribute('role','button');k.setAttribute('aria-label',noteName(m));
+    const press=ev=>{ev.preventDefault();api.press(m);};
+    const rel=()=>api.release(m);
+    k.addEventListener('pointerdown',press);
+    k.addEventListener('pointerup',rel);k.addEventListener('pointerleave',rel);k.addEventListener('pointercancel',rel);
+    el.appendChild(k);els.set(m,k);
+  });
+  const api={
+    els,
+    has:m=>els.has(m),
+    press(m){if(down.has(m))return;down.add(m);const k=els.get(m);k&&k.classList.add('down');o.onDown&&o.onDown(m);},
+    release(m){if(!down.has(m))return;down.delete(m);const k=els.get(m);k&&k.classList.remove('down');o.onUp&&o.onUp(m);},
+    flash(m,on){const k=els.get(m);k&&k.classList.toggle('down',on);},
+    releaseAll(){Array.from(down).forEach(m=>api.release(m));}
+  };
+  return api;
+}
+
+/* ================= chapter 7: mellotron ================= */
+let kbMel=null;
+(function(){
+  const vs=new Map(),timers=new Map();
+  const reel=$('#melReel'),prog=$('#melProg'),msg=$('#melMsg');
+  kbMel=buildKB($('#kbMel'),{
+    start:60,count:13,
+    onDown(m){
+      if(!AE.ensure())return;
+      Snd.claim('mellotron',9000);
+      const f=mtof(m);
+      vs.set(m,[
+        Voice({type:'sawtooth',detunes:[-7,6],freq:f,cutoff:2000,q:1,vol:.09,attack:.12,release:.5,vibrato:6,vibRate:4.6}),
+        Voice({type:'triangle',freq:f,vol:.12,attack:.12,release:.5,vibrato:4,vibRate:5.1})
+      ]);
+      reel.classList.add('run');
+      prog.style.transition='none';prog.style.width='0';void prog.offsetWidth;
+      prog.style.transition='width 8s linear';prog.style.width='100%';
+      msg.textContent='Стрічка крутиться…';
+      timers.set(m,setTimeout(()=>{msg.textContent='Стрічка закінчилась! Відпусти клавішу й натисни знову, як на справжньому мелотроні.';kbMel.release(m);},8000));
+    },
+    onUp(m){
+      const v=vs.get(m);if(v){v.forEach(x=>x.stop());vs.delete(m);}
+      clearTimeout(timers.get(m));timers.delete(m);
+      if(!vs.size){reel.classList.remove('run');prog.style.transition='width .3s';prog.style.width='0';}
+    }
+  });
+  Snd.reg('mellotron',()=>kbMel.releaseAll());
+})();
+
+/* ================= chapter 8: moog ================= */
+const M={wave:'sawtooth',cut:1440,res:6,sw:40,attack:.01,voices:new Map()};
+let kbMoog=null,filtOff=null;
+function cutFromSlider(v){return 60*Math.pow(2,v/1000*7.4);}
+function sliderFromCut(f){return Math.round(Math.log2(f/60)/7.4*1000);}
+function drawFilter(){
+  const cv=$('#filtCanvas'),fz=fit(cv);if(!fz)return;
+  const {g,w,h}=fz;g.clearRect(0,0,w,h);
+  g.strokeStyle='rgba(255,255,255,.1)';g.lineWidth=1;g.fillStyle='rgba(255,255,255,.55)';g.font='11px Onest, sans-serif';
+  [100,1000,10000].forEach(fr=>{
+    const x=(Math.log10(fr)-Math.log10(20))/3*w;
+    g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke();g.fillText(fr>=1000?(fr/1000)+' кГц':fr+' Гц',x+4,h-5);
+  });
+  const dbY=db=>h-((db+40)/70)*h;
+  g.beginPath();g.moveTo(0,dbY(0));g.lineTo(w,dbY(0));g.stroke();
+  let curve=null;
+  try{
+    if(!filtOff){const O=window.OfflineAudioContext||window.webkitOfflineAudioContext;const oc=new O(1,128,44100);filtOff=oc.createBiquadFilter();filtOff.type='lowpass';}
+    filtOff.frequency.value=M.cut;filtOff.Q.value=M.res;
+    const n=Math.max(60,Math.floor(w/3));
+    const fr=new Float32Array(n),mg=new Float32Array(n),ph=new Float32Array(n);
+    for(let i=0;i<n;i++)fr[i]=20*Math.pow(1000,i/(n-1));
+    filtOff.getFrequencyResponse(fr,mg,ph);
+    curve=Array.from(mg).map(v=>20*Math.log10(Math.max(v,1e-4)));
+  }catch(e){curve=null;}
+  if(!curve){ // analytic fallback
+    const n=Math.floor(w/3);curve=[];
+    for(let i=0;i<n;i++){const fr=20*Math.pow(1000,i/(n-1));const r=fr/M.cut;curve.push(-10*Math.log10(1+Math.pow(r,4))+(Math.abs(r-1)<.15?M.res:0));}
+  }
+  g.beginPath();
+  curve.forEach((db,i)=>{const x=i/(curve.length-1)*w,y=clamp(dbY(db),2,h-2);i?g.lineTo(x,y):g.moveTo(x,y);});
+  g.strokeStyle='#86E8B0';g.lineWidth=3;g.stroke();
+  g.lineTo(w,h);g.lineTo(0,h);g.closePath();g.fillStyle='rgba(134,232,176,.16)';g.fill();
+}
+function moogOn(m){
+  if(!AE.ensure())return;
+  Snd.claim('moog',4000);
+  if(M.voices.has(m))return;
+  const peak=Math.min(18000,M.cut*(1+M.sw/100*7));
+  const v=Voice({type:M.wave,detunes:[-8,8],freq:mtof(m),cutoff:peak,q:M.res,vol:.15,attack:M.attack,release:.3});
+  const c=AE.ctx,t=c.currentTime;
+  v.filt.frequency.cancelScheduledValues(t);
+  v.filt.frequency.setValueAtTime(peak,t);
+  v.filt.frequency.exponentialRampToValueAtTime(Math.max(40,M.cut),t+.4);
+  M.voices.set(m,v);
+}
+function moogOff(m){const v=M.voices.get(m);if(v){v.stop();M.voices.delete(m);}}
+function initMoog(){
+  const cutS=$('#mCut'),resS=$('#mRes'),swS=$('#mSw');
+  const upd=()=>{
+    M.cut=cutFromSlider(+cutS.value);M.res=+resS.value;M.sw=+swS.value;
+    $('#mCutO').textContent=Math.round(M.cut)+' Гц';$('#mResO').textContent=M.res+' дБ';$('#mSwO').textContent=M.sw+' %';
+    if(AE.ctx){const t=AE.ctx.currentTime;M.voices.forEach(v=>{v.filt.frequency.cancelScheduledValues(t);v.filt.frequency.setTargetAtTime(M.cut,t,.02);v.filt.Q.value=M.res;});}
+    drawFilter();
+  };
+  [cutS,resS,swS].forEach(s=>s.addEventListener('input',upd));
+  seg($('#moogWave'),'w',w=>{M.wave=w;M.voices.forEach(v=>v.setType(w));});
+  kbMoog=buildKB($('#kbMoog'),{start:48,count:37,onDown:moogOn,onUp:moogOff});
+  const P={
+    bass:{w:'sawtooth',c:380,r:9,s:55,a:.01},
+    lead:{w:'square',c:2800,r:4,s:20,a:.01},
+    pad:{w:'sawtooth',c:1100,r:2,s:5,a:.25}
+  };
+  seg($('#moogPre'),'p',k=>{
+    const p=P[k];M.wave=p.w;M.attack=p.a;
+    cutS.value=sliderFromCut(p.c);resS.value=p.r;swS.value=p.s;
+    $$('#moogWave button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.w===p.w)));
+    upd();
+  });
+  upd();new ResizeObserver(drawFilter).observe($('#filtCanvas'));
+  /* Bach */
+  const bar=[[60,64,67,72,76,67,72,76],[60,62,69,74,77,69,74,77],[59,62,67,74,77,67,74,77],[60,64,67,72,76,67,72,76]];
+  const seq=[].concat.apply([],bar);let timers=[],playing=false;const btn=$('#bachBtn');
+  function stopBach(){timers.forEach(clearTimeout);timers=[];playing=false;btn.textContent='▶ Зіграти Баха на цьому Moog';Array.from(M.voices.keys()).forEach(m=>{moogOff(m);kbMoog.flash(m,false);});}
+  Snd.reg('moog',()=>{stopBach();M.voices.forEach(v=>v.stop());M.voices.clear();kbMoog.releaseAll();});
+  btn.addEventListener('click',()=>{
+    if(playing){stopBach();return;}
+    if(!AE.ensure())return;
+    Snd.claim('moog',9000);
+    playing=true;btn.textContent='■ Зупинити';
+    const step=170;
+    seq.forEach((m,i)=>{
+      timers.push(setTimeout(()=>{moogOn(m);kbMoog.flash(m,true);},i*step));
+      timers.push(setTimeout(()=>{moogOff(m);kbMoog.flash(m,false);},i*step+step*.9));
+    });
+    const endT=seq.length*step;
+    timers.push(setTimeout(()=>{[48,60,64,67,72].forEach(m=>{moogOn(m);kbMoog.flash(m,true);});},endT));
+    timers.push(setTimeout(stopBach,endT+1700));
+  });
+}
+
+/* ================= chapter 9: drums ================= */
+const PRE={
+  house:{l:'Хаус',bpm:124,k:'x...x...x...x...',s:'................',c:'....x.......x...',h:'..x...x...x...x.'},
+  techno:{l:'Техно',bpm:135,k:'x...x...x...x...',s:'................',c:'....x.......x...',h:'..x...x...x...x.'},
+  trance:{l:'Транс',bpm:138,k:'x...x...x...x...',s:'...............x',c:'....x.......x...',h:'..x...x...x...x.'},
+  hiphop:{l:'Хіп-хоп · 808',bpm:90,k:'x.....x...x.....',s:'....x.......x...',c:'................',h:'x.x.x.x.x.x.x.x.'},
+  synthpop:{l:'Synth-pop',bpm:112,k:'x...x...x...x...',s:'....x.......x...',c:'................',h:'x.x.x.x.x.x.x.x.'},
+  edm:{l:'EDM',bpm:128,k:'x...x...x...x...',s:'...............x',c:'....x.......x...',h:'..x...x...x...x.'}
+};
+const Drum={pat:{kick:[],snare:[],clap:[],hat:[]},bpm:124,playing:false,step:0,next:0,timer:null,label:'Хаус',ui:{},rows:[['kick','Бочка'],['snare','Малий'],['clap','Клеп'],['hat','Хет']]};
+function initDrums(){
+  const root=$('#seq');
+  Drum.rows.forEach(r=>{
+    const row=document.createElement('div');row.className='seq-row';
+    const lab=document.createElement('span');lab.textContent=r[1];
+    const st=document.createElement('div');st.className='steps';
+    Drum.ui[r[0]]=[];
+    for(let i=0;i<16;i++){
+      const b=document.createElement('button');b.setAttribute('aria-label',r[1]+', крок '+(i+1));b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{Drum.pat[r[0]][i]=!Drum.pat[r[0]][i];b.classList.toggle('on',Drum.pat[r[0]][i]);b.setAttribute('aria-pressed',String(Drum.pat[r[0]][i]));if(!Drum.playing&&Drum.pat[r[0]][i]&&AE.ensure()){Snd.claim('drums',1500);drumHit(r[0],AE.ctx.currentTime+.01);}});
+      st.appendChild(b);Drum.ui[r[0]].push(b);Drum.pat[r[0]].push(false);
+    }
+    row.appendChild(lab);row.appendChild(st);root.appendChild(row);
+  });
+  const pre=$('#seqPre');
+  Object.keys(PRE).forEach(k=>{
+    const b=document.createElement('button');b.textContent=PRE[k].l;b.dataset.k=k;b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',()=>Drum.load(k));pre.appendChild(b);
+  });
+  const bpm=$('#seqBpm');
+  bpm.addEventListener('input',()=>{Drum.bpm=+bpm.value;$('#seqBpmO').textContent=Drum.bpm+' BPM';miniUpd();});
+  $('#seqPlay').addEventListener('click',()=>Drum.playing?Drum.stop():Drum.start());
+  $('#miniStop').addEventListener('click',()=>Drum.stop());
+  Drum.load('house',true);
+}
+Drum.load=function(k,silent){
+  const p=PRE[k];Drum.label=p.l;
+  const map={kick:p.k,snare:p.s,clap:p.c,hat:p.h};
+  Object.keys(map).forEach(r=>{for(let i=0;i<16;i++){const on=map[r][i]==='x';Drum.pat[r][i]=on;Drum.ui[r][i].classList.toggle('on',on);Drum.ui[r][i].setAttribute('aria-pressed',String(on));}});
+  Drum.bpm=p.bpm;$('#seqBpm').value=p.bpm;$('#seqBpmO').textContent=p.bpm+' BPM';
+  $$('#seqPre button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.k===k)));
+  miniUpd();
+};
+function miniUpd(){$('#miniTxt').textContent='Грає: '+Drum.label+' · '+Drum.bpm+' BPM';}
+Drum.start=function(){
+  if(!AE.ensure())return;
+  Snd.claim('drums');
+  if(Drum.playing)return;
+  Drum.playing=true;Drum.step=0;Drum.next=AE.ctx.currentTime+.08;
+  Drum.timer=setInterval(Drum.sched,25);
+  $('#seqPlay').textContent='■ Стоп';$('#miniPlayer').classList.add('show');miniUpd();
+};
+Drum.stop=function(){
+  Snd.free('drums');
+  Drum.playing=false;clearInterval(Drum.timer);
+  $('#seqPlay').textContent='▶ Грати';$('#miniPlayer').classList.remove('show');
+  Object.keys(Drum.ui).forEach(r=>Drum.ui[r].forEach(b=>b.classList.remove('cur')));
+};
+Snd.reg('drums',()=>Drum.stop());
+Drum.sched=function(){
+  const c=AE.ctx;
+  while(Drum.next<c.currentTime+.12){
+    const s=Drum.step,t=Drum.next;
+    Drum.rows.forEach(r=>{if(Drum.pat[r[0]][s])drumHit(r[0],t);});
+    setTimeout(()=>{if(!Drum.playing)return;Object.keys(Drum.ui).forEach(r=>Drum.ui[r].forEach((b,i)=>b.classList.toggle('cur',i===s)));},Math.max(0,(t-c.currentTime)*1000));
+    Drum.next+=60/Drum.bpm/4;Drum.step=(s+1)%16;
+  }
+};
+
+/* ================= chapter 9: MIDI ================= */
+const MI={inst:'piano',vel:100,voices:new Map(),log:[]};
+let kbMidi=null;
+function midiLog(hexs,text){
+  MI.log.unshift({h:hexs,t:text});MI.log=MI.log.slice(0,8);
+  const box=$('#midiLog');box.textContent='';
+  MI.log.forEach(l=>{const d=document.createElement('div');const h=document.createElement('span');h.className='hex';h.textContent=l.h;d.appendChild(h);d.appendChild(document.createTextNode(l.t));box.appendChild(d);});
+}
+function midiOn(m,vel){
+  if(!AE.ensure())return;
+  Snd.claim('midi',4000);
+  if(MI.voices.has(m))return;
+  const vol=.06+.3*(vel/127),f=mtof(m);let v;
+  if(MI.inst==='piano'){
+    v=Voice({type:'triangle',freq:f,vol:vol,attack:.004,release:.5,cutoff:3800});
+    v.out.gain.setTargetAtTime(vol*.28,AE.ctx.currentTime+.03,.55);
+  }else if(MI.inst==='bass'){
+    v=Voice({type:'sawtooth',detunes:[0,-5],freq:f/2,vol:vol*.7,attack:.005,release:.15,cutoff:650,q:5});
+  }else{
+    v=Voice({type:'sine',detunes:[0,1200,1902],freq:f,vol:vol*.4,attack:.02,release:.1});
+  }
+  MI.voices.set(m,v);
+  midiLog(hex2(0x90)+' '+hex2(m)+' '+hex2(vel),'Note On · канал 1 · нота '+m+' ('+noteName(m)+') · швидкість '+vel);
+}
+function midiOff(m){
+  const v=MI.voices.get(m);if(!v)return;
+  v.stop();MI.voices.delete(m);
+  midiLog(hex2(0x80)+' '+hex2(m)+' 00','Note Off · канал 1 · нота '+m+' ('+noteName(m)+')');
+}
+function initMidi(){
+  kbMidi=buildKB($('#kbMidi'),{start:48,count:25,onDown:m=>midiOn(m,MI.vel),onUp:midiOff});
+  Snd.reg('midi',()=>{MI.voices.forEach(v=>v.stop());MI.voices.clear();kbMidi.releaseAll();});
+  const vs=$('#midiVel');vs.addEventListener('input',()=>{MI.vel=+vs.value;$('#midiVelO').textContent=vs.value;});$('#midiVelO').textContent=vs.value;
+  seg($('#midiInst'),'i',i=>{MI.inst=i;});
+  $('#midiConnect').addEventListener('click',async()=>{
+    const st=$('#midiStatus');
+    if(!navigator.requestMIDIAccess){st.textContent='Цей браузер не підтримує Web MIDI (спробуй Chrome).';return;}
+    try{
+      const a=await navigator.requestMIDIAccess();let n=0;
+      a.inputs.forEach(inp=>{n++;inp.onmidimessage=ev=>{
+        const d=ev.data,cmd=d[0]&0xf0;
+        if(cmd===0x90&&d[2]>0){kbMidi.has(d[1])?(MI.vel=d[2],kbMidi.press(d[1])):midiOn(d[1],d[2]);}
+        else if(cmd===0x80||(cmd===0x90&&d[2]===0)){kbMidi.has(d[1])?kbMidi.release(d[1]):midiOff(d[1]);}
+      };});
+      st.textContent=n?('Підключено пристроїв: '+n+'. Грай!'):'MIDI-пристроїв не знайдено.';
+    }catch(e){st.textContent='Доступ до MIDI не надано.';}
+  });
+  midiLog('— — —','Натисни клавішу, і тут з’являться MIDI-повідомлення');
+}
+
+/* computer keyboard */
+(function(){
+  const map={KeyA:0,KeyW:1,KeyS:2,KeyE:3,KeyD:4,KeyF:5,KeyT:6,KeyG:7,KeyY:8,KeyH:9,KeyU:10,KeyJ:11,KeyK:12};
+  const ratio={moog:0,midi:0,mel:0};
+  [['moog','#s8'],['midi','#s9'],['mel','#s7']].forEach(p=>{
+    const el=$(p[1]);
+    new IntersectionObserver(es=>{ratio[p[0]]=es[0].intersectionRatio;},{threshold:[0,.1,.2,.35,.5,.75,1]}).observe(el);
+  });
+  const held={};
+  function target(){
+    let best=null,bv=.08;
+    ['moog','midi','mel'].forEach(k=>{if(ratio[k]>bv){bv=ratio[k];best=k;}});
+    return best==='moog'?kbMoog:best==='midi'?kbMidi:best==='mel'?kbMel:null;
+  }
+  addEventListener('keydown',e=>{
+    if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;
+    const tg=e.target;if(tg&&(tg.tagName==='INPUT'&&tg.type==='text'||tg.tagName==='TEXTAREA'))return;
+    if(!(e.code in map))return;
+    const kb=target();if(!kb)return;
+    const m=60+map[e.code];if(!kb.has(m))return;
+    held[e.code]=kb;kb.press(m);
+  });
+  addEventListener('keyup',e=>{
+    if(!(e.code in map))return;
+    const kb=held[e.code];if(kb){kb.release(60+map[e.code]);delete held[e.code];}
+  });
+})();
+
+/* ================= chapter 10: genres & charts ================= */
+const GENRES=[
+  {k:'house',n:'Хаус',w:'Чикаго · початок 1980-х',bpm:'≈ 120–130 BPM',t:'Назва походить від чиказького клубу Warehouse. Чотири удари бочки на такт і драм-машини створили танцювальний пульс. Одним із піонерів був діджей Френкі Накклз.'},
+  {k:'techno',n:'Техно',w:'Детройт · середина 1980-х',bpm:'≈ 125–150 BPM',t:'«Бельвільська трійка» — Хуан Аткінс, Деррік Мей і Кевін Сондерсон — поєднала електроніку у стилі Kraftwerk, фанк і образ індустріального міста.'},
+  {k:'trance',n:'Транс',w:'Німеччина · початок 1990-х',bpm:'≈ 130–145 BPM',t:'Довгі наростання, гіпнотичні повтори мелодії й швидкий пульс. Секвенсори вели слухача крізь хвилини поступових змін.'},
+  {k:'synthpop',n:'Synth-pop',w:'Європа · кінець 1970-х – 1980-ті',bpm:'≈ 100–130 BPM',t:'Пісні, де головний інструмент — синтезатор. Попередником були Kraftwerk, а в 1980-х жанр прославили, зокрема, Depeche Mode.'},
+  {k:'edm',n:'EDM',w:'Світ · 2010-ті',bpm:'≈ 120–150 BPM',t:'Electronic dance music: фестивальна сцена, великі наростання й «дропи». Більшість треків народжується в DAW на ноутбуці.'}
+];
+function barRow(label,w,val,cls,extra){
+  const r=document.createElement('div');r.className='bar-row';r.style.setProperty('--w',w+'%');
+  if(extra)Object.keys(extra).forEach(k=>r.style.setProperty(k,extra[k]));
+  const s=document.createElement('span');s.textContent=label;
+  const tr=document.createElement('div');tr.className='track';
+  const f=document.createElement('div');f.className=(extra&&extra['--l']!=null)?'rng':('fill'+(cls?' '+cls:''));
+  const v=document.createElement('span');v.className='val';v.textContent=val;
+  tr.appendChild(f);tr.appendChild(v);r.appendChild(s);r.appendChild(tr);return r;
+}
+function initGenres(){
+  const box=$('#genres');
+  GENRES.forEach(g=>{
+    const d=document.createElement('div');d.className='flip';
+    d.innerHTML='<div class="flip-in"><button class="face front" aria-label="Перевернути картку: '+g.n+'"><div><b>'+g.n+'</b><em>'+g.w+'</em></div><div><em>'+g.bpm+'</em><div class="pulse" aria-hidden="true">'+Array.from({length:14},(_,i)=>'<i style="animation-delay:'+(i*.09).toFixed(2)+'s"></i>').join('')+'</div></div></button><div class="face back"><h3>'+g.n+'</h3><p>'+g.t+'</p><div class="row" style="margin-top:auto"><button class="btn sm dark" data-play>▶ Почути ритм</button><button class="btn sm ghost" data-back style="color:#000;border-color:#000">Назад</button></div></div></div>';
+    const front=$('.front',d);
+    front.addEventListener('click',()=>d.classList.add('on'));
+    $('[data-back]',d).addEventListener('click',()=>d.classList.remove('on'));
+    $('[data-play]',d).addEventListener('click',()=>{Drum.load(g.k);Drum.start();});
+    box.appendChild(d);
+  });
+  const bp=$('#chartBpm');
+  [['Хіп-хоп',80,100],['Synth-pop',100,130],['Хаус',120,130],['EDM',120,150],['Техно',125,150],['Транс',130,145]].forEach(r=>{
+    const l=(r[1]-60)/120*100,w=(r[2]-r[1])/120*100;
+    const row=barRow(r[0],w,r[1]+'–'+r[2],'',{'--l':l+'%'});
+    const v=$('.val',row);v.style.left='calc('+(l+w)+'% + 10px)';
+    bp.appendChild(row);
+  });
+  const un=$('#chartUnits');
+  un.appendChild(barRow('TR-808 (1980)',6,'< 12 000'));
+  un.appendChild(barRow('DX7 (за 3 роки)',100,'200 000','',null));
+  const ct=$('#chartCost');
+  ct.appendChild(barRow('TR-808 · 1980',59.75,'$1 195'));
+  ct.appendChild(barRow('DX7 · 1983',99.75,'≈ $2 000'));
+  ct.appendChild(barRow('Logic Pro X · 2020',10,'≈ $200'));
+  ct.appendChild(barRow('ШІ-сервіси · 2023+',2,'$0*','red'));
+  /* position values just outside the bars */
+  $$('.bars-chart .bar-row').forEach(r=>{
+    const v=$('.val',r);if(!v||v.style.left)return;
+    v.style.left='calc(var(--w) + 10px)';
+  });
+  $$('#chartUnits .bar-row:last-child .val').forEach(v=>{v.style.left='auto';v.style.right='10px';v.style.color='#000';});
+  $$('#chartCost .bar-row:nth-child(2) .val').forEach(v=>{v.style.left='auto';v.style.right='10px';v.style.color='#000';});
+}
+
+/* ================= chapter 11: before / after ================= */
+function initBA(){
+  let s='';
+  for(let i=0;i<5;i++){
+    const x=40+i*148;
+    s+='<rect x="'+x+'" y="96" width="132" height="318" rx="6" fill="#1b1b1b" stroke="#3a3a3a"/>';
+    for(let j=0;j<7;j++){
+      const y=106+j*44;
+      s+='<rect x="'+(x+8)+'" y="'+y+'" width="116" height="36" rx="3" fill="#262626"/>';
+      for(let k=0;k<4;k++)s+='<circle cx="'+(x+24+k*26)+'" cy="'+(y+18)+'" r="7" fill="#0b0b0b" stroke="#777"/><line x1="'+(x+24+k*26)+'" y1="'+(y+18)+'" x2="'+(x+24+k*26+4)+'" y2="'+(y+12)+'" stroke="#86E8B0" stroke-width="2"/>';
+      s+='<circle cx="'+(x+114)+'" cy="'+(y+8)+'" r="3" fill="'+((i+j)%3===0?'#ff3b30':'#86E8B0')+'"/>';
+    }
+  }
+  $('#racks').innerHTML=s;
+  let d='';const cols=['#86E8B0','#fff','#ff3b30','#86E8B0','#fff','#86E8B0'];
+  for(let i=0;i<6;i++){
+    const y=146+i*31;
+    d+='<rect x="224" y="'+y+'" width="352" height="26" rx="4" fill="#1a1a1a"/>';
+    let x=228;
+    while(x<560){const w=24+((i*37+x*7)%70);d+='<rect x="'+x+'" y="'+(y+3)+'" width="'+Math.min(w,572-x)+'" height="20" rx="3" fill="'+cols[i]+'" opacity="'+(.65+((x+i)%3)*.12)+'"/>';x+=w+8+((x*3)%20);}
+  }
+  d+='<rect x="224" y="140" width="2.5" height="196" fill="#ff3b30"><animate attributeName="x" values="224;570;224" dur="7s" repeatCount="indefinite"/></rect>';
+  $('#daw').innerHTML=d;
+  const ba=$('#ba'),rg=$('#baRange');
+  rg.addEventListener('input',()=>ba.style.setProperty('--pos',rg.value+'%'));
+}
+
+/* ================= chapter 13: AI demo ================= */
+const AI={mood:'sad',notes:[],bpm:80,playing:false,t0:0,timer:null,lit:[]};
+const MOODS={
+  sad:{root:57,sc:[0,2,3,5,7,8,10],bpm:72,prog:[0,5,2,6],ty:'triangle',name:'мінор'},
+  joy:{root:60,sc:[0,2,4,5,7,9,11],bpm:128,prog:[0,4,5,3],ty:'square',name:'мажор'},
+  space:{root:62,sc:[0,2,4,6,7,9,11],bpm:90,prog:[0,1,4,1],ty:'sine',name:'лідійський лад'},
+  tense:{root:64,sc:[0,1,3,5,7,8,10],bpm:112,prog:[0,1,0,6],ty:'sawtooth',name:'фрігійський лад'}
+};
+function rngFrom(str){
+  let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}
+  return function(){h+=0x6D2B79F5;let t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};
+}
+function degMidi(M0,d){const n=M0.sc.length;const oct=Math.floor(d/n);return M0.root+oct*12+M0.sc[((d%n)+n)%n];}
+function aiGenerate(){
+  const mo=MOODS[AI.mood],prompt=$('#aiPrompt').value.trim()||'без назви';
+  const rnd=rngFrom(prompt.toLowerCase()+'|'+AI.mood);
+  const notes=[];let d=2;
+  for(let bar=0;bar<4;bar++){
+    const cr=mo.prog[bar];
+    [0,2,4].forEach(o=>notes.push({s:bar*8,l:8,m:degMidi(mo,cr+o)-12,c:true}));
+    for(let i=0;i<8;){
+      if(rnd()<.2){i++;continue;}
+      const mv=[-2,-1,-1,0,1,1,2,3][Math.floor(rnd()*8)];
+      d=clamp(d+mv,-1,9);if(i===0&&rnd()<.5)d=cr+(rnd()<.5?7:0);
+      d=clamp(d,-1,10);
+      const len=rnd()<.3&&i<7?2:1;
+      notes.push({s:bar*8+i,l:len,m:degMidi(mo,d),c:false});i+=len;
+    }
+  }
+  AI.notes=notes;AI.bpm=mo.bpm;
+  const names=['До','До♯','Ре','Ре♯','Мі','Фа','Фа♯','Соль','Соль♯','Ля','Ля♯','Сі'];
+  $('#aiInfo').textContent='«'+prompt+'» → '+names[mo.root%12]+' '+mo.name+' · '+mo.bpm+' BPM · '+notes.filter(n=>!n.c).length+' нот мелодії';
+  const ps=$$('#pipe div');ps.forEach(p=>p.classList.remove('lit'));
+  ps.forEach((p,i)=>setTimeout(()=>p.classList.add('lit'),i*380));
+  stopAI();
+}
+function stopAI(){if(AI.playing)Snd.cut();Snd.free('ai');AI.playing=false;clearTimeout(AI.timer);$('#aiPlay').textContent='▶ Слухати';}
+function playAI(){
+  if(!AI.notes.length)aiGenerate();
+  if(!AE.ensure())return;
+  Snd.claim('ai');
+  const mo=MOODS[AI.mood],sd=60/AI.bpm/2;
+  AI.playing=true;AI.t0=performance.now();$('#aiPlay').textContent='■ Стоп';
+  AI.notes.forEach(n=>{
+    if(n.c)pluck(mtof(n.m),{type:'sine',dur:sd*n.l*.95,vol:.1,when:n.s*sd});
+    else pluck(mtof(n.m),{type:mo.ty,dur:Math.max(.25,sd*n.l*1.1),vol:mo.ty==='sine'?.22:.11,when:n.s*sd,cutoff:3200});
+  });
+  clearTimeout(AI.timer);AI.timer=setTimeout(stopAI,32*sd*1000+400);
+}
+Snd.reg('ai',()=>{AI.playing=false;clearTimeout(AI.timer);$('#aiPlay').textContent='▶ Слухати';});
+function drawRoll(){
+  const cv=$('#roll'),f=fit(cv);if(!f)return;
+  const {g,w,h}=f;g.clearRect(0,0,w,h);
+  g.strokeStyle='rgba(255,255,255,.07)';g.lineWidth=1;
+  for(let i=0;i<=32;i++){g.beginPath();g.moveTo(i*w/32,0);g.lineTo(i*w/32,h);g.strokeStyle=i%8===0?'rgba(255,255,255,.22)':'rgba(255,255,255,.07)';g.stroke();}
+  if(!AI.notes.length){g.fillStyle='rgba(255,255,255,.55)';g.font='600 14px Onest, sans-serif';g.textAlign='center';g.fillText('Натисни «Згенерувати»',w/2,h/2);g.textAlign='left';return;}
+  const ms=AI.notes.map(n=>n.m),lo=Math.min.apply(null,ms)-1,hi=Math.max.apply(null,ms)+1,rh=(h-8)/(hi-lo);
+  const sd=60/AI.bpm/2,cur=AI.playing?((performance.now()-AI.t0)/1000/sd):-1;
+  AI.notes.forEach(n=>{
+    const x=n.s*w/32,ww=n.l*w/32-2,y=h-4-(n.m-lo)*rh-rh;
+    const on=cur>=n.s&&cur<n.s+n.l;
+    g.fillStyle=n.c?(on?'#fff':'rgba(255,255,255,.35)'):(on?'#fff':'#86E8B0');
+    g.fillRect(x+1,y+1,Math.max(3,ww),Math.max(3,rh-2));
+  });
+  if(cur>=0&&cur<32){g.fillStyle='#ff3b30';g.fillRect(cur*w/32,0,2,h);}
+}
+function initAI(){
+  seg($('#aiMood'),'m',m=>{AI.mood=m;aiGenerate();});
+  $('#aiGen').addEventListener('click',aiGenerate);
+  $('#aiPlay').addEventListener('click',()=>AI.playing?stopAI():playAI());
+  $('#aiPrompt').addEventListener('keydown',e=>{if(e.key==='Enter')aiGenerate();});
+  watch($('#roll'),()=>{});
+}
+
+/* ================= chapter 14: tabs, charts, poll ================= */
+function initProblems(){
+  const tb=$('#tabBad'),to=$('#tabOk'),cb=$('#cardsBad'),co=$('#cardsOk');
+  function sel(bad){tb.setAttribute('aria-selected',String(bad));to.setAttribute('aria-selected',String(!bad));cb.hidden=!bad;co.hidden=bad;}
+  tb.addEventListener('click',()=>sel(true));to.addEventListener('click',()=>sel(false));
+  /* tilt */
+  if(window.matchMedia&&matchMedia('(hover:hover)').matches&&!reduceMotion){
+    $$('.tilt').forEach(c=>{
+      c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.setProperty('--ry',(x*12)+'deg');c.style.setProperty('--rx',(-y*12)+'deg');});
+      c.addEventListener('pointerleave',()=>{c.style.setProperty('--ry','0deg');c.style.setProperty('--rx','0deg');});
+    });
+  }
+  /* line chart */
+  const svg=$('#linechart'),NS='http://www.w3.org/2000/svg';
+  const data=[[0,10,'01.25'],[3,18,'04.25'],[8,28,'09.25'],[10,34,'11.25'],[12,39,'01.26'],[15,44,'04.26'],[17,50,'06.26']];
+  const L=46,R=544,T=18,B=244,X=m=>L+m/17*(R-L),Y=v=>B-v/60*(B-T);
+  const el=(n,a,txt)=>{const e=document.createElementNS(NS,n);Object.keys(a).forEach(k=>e.setAttribute(k,a[k]));if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;};
+  [0,20,40,60].forEach(v=>{el('line',{x1:L,x2:R,y1:Y(v),y2:Y(v),stroke:'rgba(255,255,255,.14)'});el('text',{x:L-8,y:Y(v)+4,'text-anchor':'end',fill:'rgba(255,255,255,.65)','font-size':12},v+'%');});
+  const dstr=data.map((p,i)=>(i?'L':'M')+X(p[0])+' '+Y(p[1])).join(' ');
+  el('path',{d:dstr+' L'+X(17)+' '+B+' L'+X(0)+' '+B+' Z',fill:'rgba(255,59,48,.13)'});
+  const path=el('path',{d:dstr,fill:'none',stroke:'#ff3b30','stroke-width':3.5,'stroke-linejoin':'round','stroke-linecap':'round'});
+  const pts=[];
+  data.forEach((p,i)=>{
+    const c=el('circle',{cx:X(p[0]),cy:Y(p[1]),r:5,fill:i===data.length-1?'#fff':'#ff3b30',stroke:'#000','stroke-width':2,opacity:0});pts.push(c);
+    el('text',{x:X(p[0]),y:B+20,'text-anchor':'middle',fill:'rgba(255,255,255,.7)','font-size':11},p[2]);
+    const lb=el('text',{x:X(p[0]),y:Y(p[1])-12,'text-anchor':'middle',fill:'#fff','font-size':12,'font-weight':700,opacity:0},(i===data.length-1?'>':'')+p[1]+'%');pts.push(lb);
+  });
+  let len=700;try{len=path.getTotalLength();}catch(e){}
+  path.style.strokeDasharray=len;path.style.strokeDashoffset=len;
+  /* donuts */
+  const dn=$('#donuts');
+  [['> 50 %','частка в щоденних завантаженнях',.5],['1–3 %','частка в прослуховуваннях',.02]].forEach(d=>{
+    const C=2*Math.PI*46;
+    const w=document.createElement('div');
+    w.innerHTML='<svg viewBox="0 0 120 120" role="img" aria-label="'+d[1]+': '+d[0]+'"><circle class="ring-bg" cx="60" cy="60" r="46" fill="none" stroke-width="14"/><circle class="ring" cx="60" cy="60" r="46" fill="none" stroke="#ff3b30" stroke-width="14" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'" data-v="'+d[2]+'"/><text x="60" y="66" text-anchor="middle" fill="#fff" font-family="Tektur, sans-serif" font-weight="800" font-size="19">'+d[0]+'</text></svg><small>'+d[1]+'</small>';
+    dn.appendChild(w);
+  });
+  const run=()=>{
+    path.style.transition='stroke-dashoffset 2.2s cubic-bezier(.3,.7,.2,1)';path.style.strokeDashoffset=0;
+    pts.forEach((p,i)=>{p.style.transition='opacity .4s '+(.3+i*.14)+'s';p.setAttribute('opacity',1);});
+    $$('.ring',dn).forEach(r=>{const C=2*Math.PI*46;r.style.strokeDashoffset=C*(1-parseFloat(r.dataset.v));});
+  };
+  new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){run();o.disconnect();}},{threshold:.3}).observe($('.charts'));
+  /* poll */
+  const OPT=['Так, якщо за нею стоїть ідея людини','Лише коли людина веде процес і редагує результат','Ні, це лише алгоритм','Ще не знаю'];
+  const KEY='kosyanova_ai_poll_v1';let st={counts:[0,0,0,0],voted:-1};
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.counts&&s.counts.length===4)st=s;}catch(e){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}};
+  const box=$('#poll');
+  function render(){
+    box.textContent='';
+    const tot=st.counts.reduce((a,b)=>a+b,0);
+    OPT.forEach((t,i)=>{
+      const b=document.createElement('button');b.className='opt';
+      const pf=document.createElement('div');pf.className='pf';
+      const sp=document.createElement('span');
+      const a=document.createElement('span');a.textContent=t;
+      const p=document.createElement('b');
+      sp.appendChild(a);sp.appendChild(p);b.appendChild(pf);b.appendChild(sp);
+      if(st.voted>=0){
+        const pc=tot?Math.round(st.counts[i]/tot*100):0;p.textContent=pc+'% · '+st.counts[i];
+        b.disabled=true;if(i===st.voted)b.classList.add('right');
+        requestAnimationFrame(()=>{pf.style.width=pc+'%';});
+      }else b.addEventListener('click',()=>{st.counts[i]++;st.voted=i;save();render();});
+      box.appendChild(b);
+    });
+    if(st.voted>=0){
+      const r=document.createElement('button');r.className='btn sm ghost';r.textContent='Змінити відповідь';r.style.marginTop='6px';r.style.justifySelf='start';
+      r.addEventListener('click',()=>{st.counts[st.voted]=Math.max(0,st.counts[st.voted]-1);st.voted=-1;save();render();});
+      box.appendChild(r);
+    }
+  }
+  render();
+}
+
+/* ================= chapter 15: quiz ================= */
+function initQuiz(){
+  const Q=[
+    ['Скільки приблизно важила версія Телармоніума 1906 року?',['≈ 2 тонни','≈ 20 тонн','≈ 200 тонн','≈ 2 000 тонн'],2,'Майже 200 тонн. Музику передавали слухачам телефонними дротами.'],
+    ['На якому інструменті грають, не торкаючись його?',['Траутоніум','Терменвокс','Мелотрон','Moog'],1,'Лев Термен винайшов терменвокс у жовтні 1920 року.'],
+    ['Що відтворює кожна клавіша мелотрона?',['Синтезований тембр','Смужку магнітної стрічки із записом','Звук із радіоприймача','Цифровий файл із флешки'],1,'Тому мелотрон вважають кроком до семплювання.'],
+    ['На якому інструменті записано «Switched-On Bach» (1968)?',['Телармоніум','Мелотрон','Moog','Yamaha DX7'],2,'Венді Карлос записала альбом на Moog. Він отримав три «Греммі».'],
+    ['Що дозволив зробити стандарт MIDI (1983)?',['Записувати звук без мікрофона','Різним електронним інструментам працювати разом','Передавати музику телефонними дротами','Створювати вокал за текстом'],1,'MIDI передає команди (яку ноту й з якою силою натиснули), а не сам звук.'],
+    ['Яка драм-машина стала основою хіп-хопу й електроніки?',['Roland TR-808','Yamaha DX7','Mellotron','Ableton Live'],0,'TR-808 (1980) продали менше ніж 12 000 штук, але її звук упізнають досі.'],
+    ['Яка програма 1997 року починалася як FruityLoops?',['Ableton Live','Logic Pro X','FL Studio','Suno'],2,'Її створив 19-річний Дідьє Дамбрен із Бельгії.'],
+    ['Яку частку щоденних завантажень на Deezer становили ШІ-треки в червні 2026 року?',['≈ 5 %','≈ 15 %','≈ 30 %','Понад 50 %'],3,'Але в прослуховуваннях їхня частка — лише 1–3 %.']
+  ];
+  const box=$('#quiz');let i=0,score=0;
+  function show(){
+    box.textContent='';
+    if(i>=Q.length){
+      const msg=score>=7?'Ти справжній знавець електронної музики.':score>=5?'Добре! Але є що перечитати.':'Повернись до розділів і зіграй на інструментах ще раз.';
+      box.innerHTML='<div class="score">'+score+' / '+Q.length+'</div><p style="margin:10px 0 18px">'+msg+'</p>';
+      const b=document.createElement('button');b.className='btn';b.textContent='Пройти ще раз';b.addEventListener('click',()=>{i=0;score=0;show();});box.appendChild(b);return;
+    }
+    const q=Q[i];
+    const top=document.createElement('div');top.className='quiz-top';top.innerHTML='<span>Питання '+(i+1)+' з '+Q.length+'</span><span>Рахунок: '+score+'</span>';
+    const qb=document.createElement('div');qb.className='qbar';qb.innerHTML='<i style="width:'+(i/Q.length*100)+'%"></i>';
+    const t=document.createElement('div');t.className='q-text';t.textContent=q[0];
+    const o=document.createElement('div');o.className='opts';
+    const ex=document.createElement('div');ex.className='q-exp';ex.setAttribute('aria-live','polite');
+    const nx=document.createElement('button');nx.className='btn sm';nx.textContent=i===Q.length-1?'Дізнатись результат':'Далі';nx.style.display='none';nx.addEventListener('click',()=>{i++;show();});
+    q[1].forEach((txt,k)=>{
+      const b=document.createElement('button');b.className='opt';b.innerHTML='<span></span>';b.firstChild.textContent=txt;
+      b.addEventListener('click',()=>{
+        $$('.opt',o).forEach((x,kk)=>{x.disabled=true;if(kk===q[2])x.classList.add('right');});
+        if(k===q[2]){score++;ex.textContent='Правильно! '+q[3];}else{b.classList.add('wrong');ex.textContent='Не зовсім. '+q[3];}
+        nx.style.display='inline-flex';
+      });
+      o.appendChild(b);
+    });
+    [top,qb,t,o,ex,nx].forEach(x=>box.appendChild(x));
+  }
+  show();
+}
+
+/* ================= generic in-view ================= */
+function initInview(){
+  const io=new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('inview');o.unobserve(e.target);}});},{threshold:.25});
+  $$('.bars-chart').forEach(b=>io.observe(b));
+}
+
+/* ================= main loop ================= */
+let lastT=performance.now(),scrollY0=scrollY,sVel=0;
+function tick(t){
+  const dt=Math.min(.05,(t-lastT)/1000);lastT=t;
+  if(document.hidden){requestAnimationFrame(tick);return;}
+  sVel=lerp(sVel,scrollY-scrollY0,.15);scrollY0=scrollY;
+  const amp=1.6+Math.min(11,Math.abs(sVel)*.25);
+  warps.forEach(w=>{
+    if(!w.vis)return;
+    const A=w.big?amp*1.6:amp;
+    w.letters.forEach((s,i)=>{
+      s.style.transform='translateY('+(Math.sin(t*.0022+i*.55)*A).toFixed(2)+'px) rotate('+(Math.sin(t*.0016+i*.4)*A*.2).toFixed(2)+'deg)';
+    });
+  });
+  if(Hero.render&&Hero.visible)Hero.render(t,dt);
+  if(lab3&&isVis($('#labCanvas')))lab3(t);
+  if(isVis($('#labCanvas'))||isVis($('#labScope')))drawScope(t);
+  if(isVis($('#eraCanvas')))drawEra(t);
+  if(isVis($('#thereminPad')))drawTheremin(t);
+  if(isVis($('#roll')))drawRoll();
+  requestAnimationFrame(tick);
+}
+
+/* ================= boot ================= */
+function boot(){
+  initLab();
+  /* make scope visible-aware */
+  watch($('#labScope'),()=>{});
+  initEras();
+  initTheremin();
+  initMoog();
+  initDrums();
+  initMidi();
+  initGenres();
+  initBA();
+  initAI();
+  initProblems();
+  initQuiz();
+  initInview();
+  initHero();
+  requestAnimationFrame(tick);
+}
+const ready=()=>{try{boot();}catch(e){console.error(e);}};
+if(document.fonts&&document.fonts.ready){
+  Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]).then(ready);
+}else ready();
+})();
+
+</script>
+</body>
+</html>
